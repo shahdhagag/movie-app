@@ -1,2 +1,0 @@
-// Onboarding Page Indicator Widget
-

@@ -1,2 +1,0 @@
-// Onboarding Skip Button Widget
-

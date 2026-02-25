@@ -1,2 +1,0 @@
-// Onboarding Next Button Widget
-
