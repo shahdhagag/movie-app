@@ -10,6 +10,8 @@ class AppAssets {
   static const String appLogo = '$_logosPath/app_logo.png';
   static const String splashLogo = '$_logosPath/splash_logo.png';
   static const String brandingLogo = '$_logosPath/branding_logo.png';
+  static const String availableNowLogo = '$_logosPath/Available Now.png';
+  static const String watchNowLogo = '$_logosPath/Watch Now (1).png';
 
 
   /// ONBOARDING IMAGES
@@ -60,7 +62,7 @@ class AppAssets {
   /// BACKGROUND IMAGES
   static const String forgotPasswordBackground = '$_imagesPath/background/forgot_password.png';
   static const String splashBackground = '$_imagesPath/background/splash_screen_bg.png';
-
+  static const String backgroundImage = '$_imagesPath/background/kgroundImage (1).png';
 
   /// EMPTY STATES
   static const String emptyStateSearchList = '$_imagesPath/emptyStates/empty_state.png';

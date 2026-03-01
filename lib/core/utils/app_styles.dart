@@ -5,7 +5,6 @@ import 'app_colors.dart';
 /// App Text Styles
 class AppStyles {
 
-  // ========== HEADINGS ==========
   static TextStyle h1 = TextStyle(
     fontSize: 32.sp,
     fontWeight: FontWeight.bold,
