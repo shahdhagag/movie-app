@@ -1,13 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:movie/features/home/presentation/screens/home_screen.dart';
-import '../../features/browse/presentation/screen/browes_screen.dart';
-import '../../features/home/domain/entities/movie.dart';
-import '../../features/home/presentation/screens/genre_movies_screen.dart';
-import '../../features/home/presentation/screens/main_screen.dart';
-import '../../features/movie_details/presentation/screens/movie_details_screen.dart';
-import '../../features/profile/presentation/screens/profile_screen.dart';
-import '../../features/search/presentation/screen/search_screen.dart';
 import 'app_routes.dart';
 
 
@@ -15,9 +7,7 @@ import 'app_routes.dart';
 class AppRouter {
 
   static final GoRouter router = GoRouter(
-    initialLocation: AppRoutes.main, //  start with main
-
-   // initialLocation: AppRoutes.splash,
+    initialLocation: AppRoutes.splash,
     debugLogDiagnostics: true,
     routes: [
 
@@ -50,30 +40,17 @@ class AppRouter {
       ),
 
       GoRoute(
-        path: AppRoutes.main,
-        name: 'main',
-        builder: (context, state) => const MainScreen(),
-      ),
-      GoRoute(
         path: AppRoutes.home,
         name: 'home',
-        builder: (context, state) => const HomeScreen(),
+        builder: (context, state) => const Placeholder(), // TODO: Replace with HomeScreen
       ),
+
       GoRoute(
-        path: AppRoutes.genreMovies,
+        path: '${AppRoutes.movieDetails}/:id',
+        name: 'movieDetails',
         builder: (context, state) {
-          final extras = state.extra as Map<String, dynamic>;
-          return GenreMoviesScreen(
-            genre: extras['genre'] as String,
-            movies: extras['movies'] as List<Movie>,
-          );
-        },
-      ),
-      GoRoute(
-        path: AppRoutes.movieDetails,
-        builder: (context, state) {
-          final movieId = state.extra as int;
-          return MovieDetailsScreen(movieId: movieId);
+          final movieId = state.pathParameters['id']!;
+          return Placeholder(); // TODO: Replace with MovieDetailsScreen(movieId: movieId)
         },
       ),
       GoRoute(
@@ -105,31 +82,23 @@ class AppRouter {
       GoRoute(
         path: AppRoutes.search,
         name: 'search',
-        builder: (context, state) => const SearchScreen(),
-      ),
-      GoRoute(
-        path: AppRoutes.browse,
-        name: 'browse',
-        builder: (context, state) => const BrowseScreen(),
+        builder: (context, state) => const Placeholder(), // TODO: Replace with SearchScreen
       ),
 
       GoRoute(
         path: AppRoutes.profile,
         name: 'profile',
-        builder: (context, state) => const ProfileScreen(),
+        builder: (context, state) => const Placeholder(), // TODO: Replace with ProfileScreen
       ),
-
-
-
       GoRoute(
         path: AppRoutes.editProfile,
         name: 'editProfile',
-        builder: (context, state) => const Placeholder(),
+        builder: (context, state) => const Placeholder(), // TODO: Replace with EditProfileScreen
       ),
       GoRoute(
         path: AppRoutes.updateProfile,
         name: 'updateProfile',
-        builder: (context, state) => const Placeholder(),
+        builder: (context, state) => const Placeholder(), // TODO: Replace with UpdateProfileScreen
       ),
       GoRoute(
         path: AppRoutes.favorites,
@@ -196,7 +165,12 @@ class AppRouter {
       ),
     ),
 
-
+    // Redirect logic (optional)
+    redirect: (context, state) {
+      // Add your redirect logic here
+      // For example, check if user is logged in, first time user, etc.
+      return null; // No redirect
+    },
   );
 }
 
