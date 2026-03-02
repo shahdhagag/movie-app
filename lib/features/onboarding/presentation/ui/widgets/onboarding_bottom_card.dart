@@ -32,8 +32,7 @@ class OnboardingBottomCard extends StatelessWidget {
         color: AppColors.background,
         borderRadius: BorderRadius.vertical(top: Radius.circular(40.r)),
       ),
-      child: Expanded(
-        child: Column(
+      child: Column(
           mainAxisSize: MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.center,
 
@@ -80,7 +79,6 @@ class OnboardingBottomCard extends StatelessWidget {
             ],
           ],
         ),
-      ),
     );
   }
 }

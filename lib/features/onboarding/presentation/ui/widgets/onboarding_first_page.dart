@@ -3,7 +3,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
 import 'package:movie/core/utils/app_assets.dart';
 import 'package:movie/core/utils/app_styles.dart';
-import 'onboarding_bottom_card.dart';
 
 class OnboardingFirstPage extends StatelessWidget {
   final VoidCallback onExplore;

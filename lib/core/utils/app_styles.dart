@@ -13,6 +13,13 @@ class AppStyles {
     height: 1.2,
   );
 
+  static TextStyle h1copy = TextStyle(
+    fontSize: 16.sp,
+    fontWeight: FontWeight.w400,
+    color: AppColors.textSecondary,
+    height: 1.5,
+  );
+
   static TextStyle h2 = TextStyle(
     fontSize: 28.sp,
     fontWeight: FontWeight.bold,
@@ -152,5 +159,18 @@ class AppStyles {
     height: 1.5,
   );
 
+  // ========== ONBOARDING BUTTON TEXT ==========
+  static TextStyle textButton = TextStyle(
+    fontSize: 16.sp,
+    fontWeight: FontWeight.w600,
+    color: AppColors.textPrimary,
+    letterSpacing: 0.5,
+  );
 
+  static TextStyle outlineButtonText = TextStyle(
+    fontSize: 16.sp,
+    fontWeight: FontWeight.w600,
+    color: AppColors.primary,
+    letterSpacing: 0.5,
+  );
 }
