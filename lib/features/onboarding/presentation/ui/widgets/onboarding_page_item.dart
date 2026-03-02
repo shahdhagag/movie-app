@@ -27,6 +27,23 @@ class OnboardingPageItem extends StatelessWidget {
             fit: BoxFit.cover,
           ),
         ),
+        // Dark gradient overlay for readability
+        Positioned.fill(
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  Colors.black.withOpacity(0.3),
+                  Colors.black.withOpacity(0.5),
+                  Colors.black.withOpacity(0.85),
+                ],
+                stops: const [0.0, 0.5, 1.0],
+              ),
+            ),
+          ),
+        ),
         Align(
           alignment: Alignment.bottomCenter,
           child: OnboardingBottomCard(

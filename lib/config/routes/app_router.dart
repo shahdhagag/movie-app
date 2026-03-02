@@ -9,6 +9,7 @@ import '../../features/home/presentation/screens/main_screen.dart';
 import '../../features/movie_details/presentation/screens/movie_details_screen.dart';
 import '../../features/profile/presentation/screens/profile_screen.dart';
 import '../../features/search/presentation/screen/search_screen.dart';
+import '../../features/splash/splash_screen.dart';
 import 'app_routes.dart';
 
 
@@ -16,21 +17,23 @@ import 'app_routes.dart';
 class AppRouter {
 
   static final GoRouter router = GoRouter(
-    initialLocation: AppRoutes.onboarding,
+    initialLocation: AppRoutes.splash,
     debugLogDiagnostics: true,
     routes: [
 
       GoRoute(
         path: AppRoutes.splash,
         name: 'splash',
-        builder: (context, state) => const Placeholder(), // TODO: Replace with SplashScreen
+        builder: (context, state) => const SplashScreen(),
       ),
 
       GoRoute(
         path: AppRoutes.onboarding,
         name: 'onboarding',
-        builder: (context, state) => OnboardingScreen() , // TODO: Replace with OnboardingScreen
+        builder: (context, state) => OnboardingScreen() ,
       ),
+
+
 
       GoRoute(
         path: AppRoutes.login,
@@ -48,6 +51,9 @@ class AppRouter {
         builder: (context, state) => const Placeholder(), // TODO: Replace with ForgotPasswordScreen
       ),
 
+
+
+      /// shahd part pls dont touch
       GoRoute(
         path: AppRoutes.main,
         name: 'main',
@@ -75,6 +81,16 @@ class AppRouter {
           return MovieDetailsScreen(movieId: movieId);
         },
       ),
+
+
+
+
+
+
+
+
+
+
       GoRoute(
         path: AppRoutes.moviesByGenre,
         name: 'moviesByGenre',

@@ -3,15 +3,15 @@ class AppAssets {
 
   // Base paths
   static const String _imagesPath = 'assets/images';
-  static const String _iconsPath = 'assets/icons';
-  static const String _logosPath = 'assets/logos';
+  static const String _iconsPath = 'assets/images/icons';
+  static const String _logosPath = 'assets/images/logos';
 
   /// LOGOS
-  static const String appLogo = '$_logosPath/app_logo.png';
-  static const String splashLogo = '$_logosPath/splashlogo.png';
+  static const String appLogo = '$_logosPath/appLogo.png';
+  static const String splashLogo = '$_logosPath/splash_logo.png';
   static const String brandingLogo = '$_logosPath/branding_logo.png';
   static const String availableNowLogo = '$_logosPath/Available Now.png';
-  static const String watchNowLogo = '$_logosPath/Watch Now (1).png';
+  static const String watchNowLogo = '$_logosPath/Watch Now (2).png';
 
 
   /// ONBOARDING IMAGES
@@ -44,7 +44,7 @@ class AppAssets {
   static const String userIcon = '$_iconsPath/ic_user.png';
   static const String saveIcon = '$_iconsPath/ic_save.png';
   static const String arrowBackYellowIcon = '$_iconsPath/ic_arrow_back_yellow.png';
-  static const String arrowBackWhiteIcon = '$_iconsPath/ic_arrow_back_white.png';
+  static const String arrowBackWhiteIcon = '$_iconsPath/ic_arow_back_white.png';
 
 
   /// PLACEHOLDER IMAGES
@@ -60,12 +60,10 @@ class AppAssets {
 
 
   /// BACKGROUND IMAGES
-  static const String forgotPasswordBackground = '$_imagesPath/background/forgot_password.png';
-  static const String splashBackground = '$_imagesPath/background/splash_screen_bg.png';
+  static const String forgotPasswordBackground = '$_imagesPath/background/Forgot password.png';
+  static const String splashBackground = '$_imagesPath/background/Splash_Screen_bg.png';
   static const String backgroundImage = '$_imagesPath/background/kgroundImage (1).png';
 
   /// EMPTY STATES
   static const String emptyStateSearchList = '$_imagesPath/emptyStates/empty_state.png';
-  static const String errorState = '$_imagesPath/emptyStates/error_state.png';
-  static const String noConnection = '$_imagesPath/emptyStates/no_connection.png';
 }

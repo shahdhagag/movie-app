@@ -23,7 +23,7 @@ class CustomBottomNavBar extends StatelessWidget {
     ];
 
     return Container(
-      height: 60.h,
+      height: 70.h,
       margin: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
         color: AppColors.grey,
