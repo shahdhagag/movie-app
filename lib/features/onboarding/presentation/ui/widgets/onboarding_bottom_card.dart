@@ -21,7 +21,7 @@ class OnboardingBottomCard extends StatelessWidget {
     required this.onPrimaryPressed,
     this.secondaryText,
     this.onSecondaryPressed,
-    // this.height,
+
   });
 
   @override

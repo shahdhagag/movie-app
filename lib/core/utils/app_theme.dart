@@ -13,13 +13,13 @@ class AppTheme {
         textStyle: MaterialStateProperty.all(AppStyles.movieTitle),
 
         backgroundColor: MaterialStateProperty.all(AppColors.primary),
-        // fixedSize: MaterialStateProperty.all(const Size(350, 50)),
+
         shape: MaterialStateProperty.all(
           RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(15),
           ),
         ),
-        padding: MaterialStateProperty.all(EdgeInsets.symmetric(horizontal: 16.w,vertical: 30.h)),
+        padding: MaterialStateProperty.all(EdgeInsets.symmetric(horizontal: 8.w,vertical: 7.h)),
       ),
     ),
   );
