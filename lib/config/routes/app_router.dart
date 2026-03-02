@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import '../../features/onboarding/presentation/ui/onboarding_screen.dart';
 import 'app_routes.dart';
 
 
@@ -7,7 +8,7 @@ import 'app_routes.dart';
 class AppRouter {
 
   static final GoRouter router = GoRouter(
-    initialLocation: AppRoutes.splash,
+    initialLocation: AppRoutes.onboarding,
     debugLogDiagnostics: true,
     routes: [
 
@@ -20,7 +21,7 @@ class AppRouter {
       GoRoute(
         path: AppRoutes.onboarding,
         name: 'onboarding',
-        builder: (context, state) => const Placeholder(), // TODO: Replace with OnboardingScreen
+        builder: (context, state) => OnboardingScreen() , // TODO: Replace with OnboardingScreen
       ),
 
       GoRoute(

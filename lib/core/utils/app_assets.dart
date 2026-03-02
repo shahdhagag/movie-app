@@ -8,7 +8,7 @@ class AppAssets {
 
   /// LOGOS
   static const String appLogo = '$_logosPath/app_logo.png';
-  static const String splashLogo = '$_logosPath/splash_logo.png';
+  static const String splashLogo = '$_logosPath/splashlogo.png';
   static const String brandingLogo = '$_logosPath/branding_logo.png';
 
 

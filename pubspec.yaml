@@ -50,8 +50,16 @@ flutter:
 
   assets:
     - assets/images/
-    - assets/icons/
-    - assets/logos/
+    - assets/images/background/
+    - assets/images/emptyStates/
+    - assets/images/icons/
+    - assets/images/logos/
+    - assets/images/onboarding/
+    - assets/images/placeholder/
+
+
+
+
 
 
   # An image asset can refer to one or more resolution-specific "variants", see
