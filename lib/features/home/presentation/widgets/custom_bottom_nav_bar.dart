@@ -32,10 +32,10 @@ class CustomBottomNavBar extends StatelessWidget {
           child: Container(
             height: 70.h,
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.15), // semi-transparent glass
+              color: Colors.white.withOpacity(0.15),
               borderRadius: BorderRadius.circular(24.r),
               border: Border.all(
-                color: Colors.white.withOpacity(0.2), // subtle border
+                color: Colors.white.withOpacity(0.2),
                 width: 1,
               ),
               boxShadow: [
@@ -63,7 +63,7 @@ class CustomBottomNavBar extends StatelessWidget {
                       borderRadius: BorderRadius.circular(16.r),
                     ),
                     child: AnimatedScale(
-                      scale: isSelected ? 1.2 : 1.0, // slightly larger when selected
+                      scale: isSelected ? 1.2 : 1.0,
                       duration: const Duration(milliseconds: 300),
                       child: Image.asset(
                         items[index],
