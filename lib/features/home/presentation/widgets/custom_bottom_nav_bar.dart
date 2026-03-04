@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../../core/utils/app_assets.dart';
@@ -22,32 +23,61 @@ class CustomBottomNavBar extends StatelessWidget {
       AppAssets.profileIcon,
     ];
 
-    return Container(
-      height: 70.h,
-      margin: EdgeInsets.all(16.w),
-      decoration: BoxDecoration(
-        color: AppColors.grey,
-        borderRadius: BorderRadius.circular(16.r),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: List.generate(items.length, (index) {
-          final isSelected = index == currentIndex;
-
-          return GestureDetector(
-            onTap: () => onTap(index),
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 250),
-              padding: EdgeInsets.all(8.w),
-              child: Image.asset(
-                items[index],
-                width: 22.w,
-                height: 22.h,
-                color: isSelected ? AppColors.primary : AppColors.textPrimary,
+    return Padding(
+      padding: EdgeInsets.all(16.w),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(24.r),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+          child: Container(
+            height: 70.h,
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.15), // semi-transparent glass
+              borderRadius: BorderRadius.circular(24.r),
+              border: Border.all(
+                color: Colors.white.withOpacity(0.2), // subtle border
+                width: 1,
               ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.1),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ],
             ),
-          );
-        }),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: List.generate(items.length, (index) {
+                final isSelected = index == currentIndex;
+
+                return GestureDetector(
+                  onTap: () => onTap(index),
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 300),
+                    padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
+                    decoration: BoxDecoration(
+                      color: isSelected
+                          ? Colors.white.withOpacity(0.25)
+                          : Colors.transparent,
+                      borderRadius: BorderRadius.circular(16.r),
+                    ),
+                    child: AnimatedScale(
+                      scale: isSelected ? 1.2 : 1.0, // slightly larger when selected
+                      duration: const Duration(milliseconds: 300),
+                      child: Image.asset(
+                        items[index],
+                        width: 24.w,
+                        height: 24.h,
+                        color: isSelected ? AppColors.primary : AppColors.textPrimary,
+                      ),
+                    ),
+                  ),
+                );
+              }),
+            ),
+          ),
+        ),
       ),
     );
   }
