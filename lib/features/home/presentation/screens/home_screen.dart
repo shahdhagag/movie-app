@@ -56,17 +56,14 @@ class HomeScreen extends StatelessWidget {
             final adventureMovies = state.adventureMovies;
             final animationMovies = state.animationMovies;
 
-
             return Stack(
               children: [
-                /// Full-screen background image
                 Positioned.fill(
                   child: Image.asset(
                     AppAssets.backgroundImage,
                     fit: BoxFit.fill,
                   ),
                 ),
-
                 Positioned.fill(
                   child: DecoratedBox(
                     decoration: BoxDecoration(
@@ -83,36 +80,35 @@ class HomeScreen extends StatelessWidget {
                     ),
                   ),
                 ),
-
-                /// Main content
                 SingleChildScrollView(
                   child: Padding(
-                    padding: EdgeInsets.only(bottom: 100.h),
+                    padding: EdgeInsets.only(bottom: 120.h),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Gap(10.h),
+                        Gap(50.h),
 
                         Center(
                           child: Image.asset(
                             AppAssets.availableNowLogo,
-                            width: 250.w,
-                            height: 93.h,
+                            width: 300.w,
+                            height: 100.h,
                           ),
                         ),
-                        Gap(20.h),
+                        Gap(30.h),
 
                         /// Featured Movies Carousel
                         CarouselSlider.builder(
+                          key: const ValueKey('featured_carousel'),
                           itemCount: featuredMovies.length,
                           options: CarouselOptions(
-                            height: 300.h,
+                            height: 380.h,
                             enlargeCenterPage: true,
-                            enlargeFactor: 0.25,
-                            viewportFraction: 0.55,
+                            enlargeFactor: 0.3,
+                            viewportFraction: 0.5,
                             enableInfiniteScroll: true,
                             autoPlay: true,
-                            autoPlayInterval: const Duration(seconds: 3),
+                            autoPlayInterval: const Duration(seconds: 4),
                             autoPlayAnimationDuration:
                             const Duration(milliseconds: 800),
                             autoPlayCurve: Curves.easeInOut,
@@ -128,11 +124,13 @@ class HomeScreen extends StatelessWidget {
                                   extra: movie.id,
                                 );
                               },
-                              width: 200,
-                              height: 300,
+                              width: 250.w,
+                              height: 350.h,
                             );
                           },
                         ),
+
+                        Gap(20.h),
 
                         Center(
                           child: Image.asset(
@@ -142,6 +140,8 @@ class HomeScreen extends StatelessWidget {
                           ),
                         ),
 
+                        Gap(16.h),
+
                         /// ACTION SECTION
                         _buildGenreSection(
                           context: context,
@@ -149,7 +149,7 @@ class HomeScreen extends StatelessWidget {
                           allGenreMovies: actionMovies,
                         ),
 
-                        Gap(16.h),
+                        Gap(24.h),
 
                         /// ADVENTURE SECTION
                         _buildGenreSection(
@@ -158,7 +158,7 @@ class HomeScreen extends StatelessWidget {
                           allGenreMovies: adventureMovies,
                         ),
 
-                        Gap(16.h),
+                        Gap(24.h),
 
                         /// ANIMATION SECTION
                         _buildGenreSection(
@@ -180,13 +180,11 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  ///  header + horizontal movie list
   Widget _buildGenreSection({
     required BuildContext context,
     required String title,
     required List<Movie> allGenreMovies,
   }) {
-    // Show up to 10 in the horizontal preview list
     final previewMovies = allGenreMovies.take(10).toList();
 
     return Column(
@@ -204,8 +202,9 @@ class HomeScreen extends StatelessWidget {
             );
           },
         ),
+        Gap(12.h),
         SizedBox(
-          height: 180.h,
+          height: 220.h,
           child: previewMovies.isEmpty
               ? Center(
             child: Text(
@@ -216,10 +215,11 @@ class HomeScreen extends StatelessWidget {
               ),
             ),
           )
-              : ListView.builder(
+              : ListView.separated(
             scrollDirection: Axis.horizontal,
             padding: EdgeInsets.symmetric(horizontal: 16.w),
             itemCount: previewMovies.length,
+            separatorBuilder: (context, index) => Gap(12.w),
             itemBuilder: (context, index) {
               final movie = previewMovies[index];
               return MovieCard(
@@ -231,8 +231,8 @@ class HomeScreen extends StatelessWidget {
                     extra: movie.id,
                   );
                 },
-                width: 120,
-                height: 180,
+                width: 160.w,
+                height: 230.h,
               );
             },
           ),
@@ -260,6 +260,11 @@ class HomeScreen extends StatelessWidget {
           ),
           TextButton(
             onPressed: onSeeMore,
+            style: TextButton.styleFrom(
+              padding: EdgeInsets.zero,
+              minimumSize: const Size(50, 30),
+              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            ),
             child: Row(
               children: [
                 Text(
@@ -269,6 +274,7 @@ class HomeScreen extends StatelessWidget {
                     fontSize: 14.sp,
                   ),
                 ),
+                Gap(4.w),
                 Icon(
                   Icons.arrow_forward,
                   size: 16.sp,

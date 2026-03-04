@@ -3,7 +3,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
 import 'package:movie/core/utils/app_assets.dart';
 import 'package:movie/core/utils/app_styles.dart';
-import 'onboarding_bottom_card.dart';
 
 class OnboardingFirstPage extends StatelessWidget {
   final VoidCallback onExplore;
@@ -16,6 +15,23 @@ class OnboardingFirstPage extends StatelessWidget {
       children: [
         Positioned.fill(
           child: Image.asset(AppAssets.onboarding1, fit: BoxFit.cover),
+        ),
+        // Dark gradient overlay for readability
+        Positioned.fill(
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  Colors.black.withOpacity(0.1),
+                  Colors.black.withOpacity(0.4),
+                  Colors.black.withOpacity(0.9),
+                ],
+                stops: const [0.0, 0.4, 1.0],
+              ),
+            ),
+          ),
         ),
         Align(
           alignment: Alignment.bottomCenter,
