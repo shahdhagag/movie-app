@@ -51,7 +51,7 @@ class HomeScreen extends StatelessWidget {
 
           if (state is HomeLoaded) {
             final movies = state.movies;
-            final featuredMovies = movies.take(20).toList();
+            final featuredMovies = movies.take(10).toList();
             final actionMovies = state.actionMovies;
             final adventureMovies = state.adventureMovies;
             final animationMovies = state.animationMovies;
@@ -124,8 +124,8 @@ class HomeScreen extends StatelessWidget {
                                   extra: movie.id,
                                 );
                               },
-                              width: 250.w,
-                              height: 350.h,
+                              width: 250,
+                              height: 350,
                             );
                           },
                         ),
