@@ -86,7 +86,7 @@ class HomeScreen extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Gap(50.h), // Top Spacing
+                        Gap(50.h),
 
                         Center(
                           child: Image.asset(
@@ -95,10 +95,9 @@ class HomeScreen extends StatelessWidget {
                             height: 100.h,
                           ),
                         ),
-                        Gap(30.h), // Logo Spacing
+                        Gap(30.h),
 
                         /// Featured Movies Carousel
-                        /// Using Key and specific viewportFraction to prevent assertion error
                         CarouselSlider.builder(
                           key: const ValueKey('featured_carousel'),
                           itemCount: featuredMovies.length,
@@ -106,7 +105,7 @@ class HomeScreen extends StatelessWidget {
                             height: 380.h,
                             enlargeCenterPage: true,
                             enlargeFactor: 0.3,
-                            viewportFraction: 0.6, // Increased slightly to stabilize layout
+                            viewportFraction: 0.5,
                             enableInfiniteScroll: true,
                             autoPlay: true,
                             autoPlayInterval: const Duration(seconds: 4),
@@ -125,8 +124,8 @@ class HomeScreen extends StatelessWidget {
                                   extra: movie.id,
                                 );
                               },
-                              width: 250,
-                              height: 350,
+                              width: 250.w,
+                              height: 350.h,
                             );
                           },
                         ),
@@ -150,7 +149,7 @@ class HomeScreen extends StatelessWidget {
                           allGenreMovies: actionMovies,
                         ),
 
-                        Gap(24.h), // Spacing between genres
+                        Gap(24.h),
 
                         /// ADVENTURE SECTION
                         _buildGenreSection(
@@ -159,7 +158,7 @@ class HomeScreen extends StatelessWidget {
                           allGenreMovies: adventureMovies,
                         ),
 
-                        Gap(24.h), // Spacing between genres
+                        Gap(24.h),
 
                         /// ANIMATION SECTION
                         _buildGenreSection(
@@ -203,7 +202,7 @@ class HomeScreen extends StatelessWidget {
             );
           },
         ),
-        Gap(12.h), // Spacing between title and horizontal list
+        Gap(12.h),
         SizedBox(
           height: 220.h,
           child: previewMovies.isEmpty

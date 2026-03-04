@@ -23,7 +23,7 @@ class MovieDetailsHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 480.h,
+      height: 650.h,
       width: double.infinity,
       child: Stack(
         fit: StackFit.expand,
@@ -75,7 +75,7 @@ class MovieDetailsHeader extends StatelessWidget {
               child: Icon(
                 Icons.arrow_back_ios_new,
                 color: Colors.white,
-                size: 24.sp,
+                size: 30.sp,
               ),
             ),
           ),
@@ -89,7 +89,7 @@ class MovieDetailsHeader extends StatelessWidget {
               child: Icon(
                 Icons.bookmark_border,
                 color: Colors.white,
-                size: 24.sp,
+                size: 30.sp,
               ),
             ),
           ),

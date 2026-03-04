@@ -12,17 +12,21 @@ class GenresSection extends StatelessWidget {
   Widget build(BuildContext context) {
     if (genres.isEmpty) return const SizedBox.shrink();
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text('Genres', style: AppStyles.h5),
-        SizedBox(height: 12.h),
-        Wrap(
-          spacing: 10.w,
-          runSpacing: 10.h,
-          children: genres.map((genre) => _GenreChip(genre: genre)).toList(),
-        ),
-      ],
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          Text('Genres', style: AppStyles.h5),
+          SizedBox(height: 12.h),
+          Wrap(
+            spacing: 10.w,
+            runSpacing: 10.h,
+            children: genres.map((genre) => _GenreChip(genre: genre)).toList(),
+          ),
+        ],
+      ),
     );
   }
 }

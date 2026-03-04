@@ -17,7 +17,8 @@ import 'app_routes.dart';
 class AppRouter {
 
   static final GoRouter router = GoRouter(
-    initialLocation: AppRoutes.splash,
+     initialLocation: AppRoutes.splash,
+   // initialLocation: AppRoutes.main,
     debugLogDiagnostics: true,
     routes: [
 

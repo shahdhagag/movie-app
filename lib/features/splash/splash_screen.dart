@@ -23,7 +23,6 @@ class _SplashScreenState extends State<SplashScreen>
   void initState() {
     super.initState();
 
-    // Remove the native splash screen now that Flutter is ready
     FlutterNativeSplash.remove();
 
     _controller = AnimationController(

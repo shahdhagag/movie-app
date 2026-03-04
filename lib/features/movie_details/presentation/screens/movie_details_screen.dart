@@ -81,7 +81,7 @@ class MovieDetailsScreen extends StatelessWidget {
 
               return SingleChildScrollView(
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Stack(
                       clipBehavior: Clip.none,
