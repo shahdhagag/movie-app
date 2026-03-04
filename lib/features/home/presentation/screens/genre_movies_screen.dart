@@ -32,12 +32,15 @@ class GenreMoviesScreen extends StatelessWidget {
         title: Text(
           '$genre Movies',
           style: TextStyle(
-            color: AppColors.textPrimary,
-            fontSize: 20.sp,
+            fontFamily: 'Poppins',
+            fontSize: 22.sp,
             fontWeight: FontWeight.w600,
+            color: AppColors.textPrimary,
+            letterSpacing: 0.3,
           ),
         ),
         centerTitle: true,
+
       ),
       body: movies.isEmpty
           ? Center(
