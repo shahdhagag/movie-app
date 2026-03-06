@@ -11,6 +11,11 @@ import '../../features/movie_details/domain/repositories/movie_details_repositor
 import '../../features/movie_details/domain/usecases/get_movie_details.dart';
 import '../../features/movie_details/domain/usecases/get_movie_suggestions.dart';
 import '../../features/movie_details/presentation/bloc/movie_details_bloc.dart';
+import '../../features/search/data/dataSourses/search_remote_data_source.dart';
+import '../../features/search/data/reposatories/search_repository_impl.dart';
+import '../../features/search/domain/repositories/search_repo.dart';
+import '../../features/search/domain/usecases/search_movies_usecase.dart';
+import '../../features/search/presentation/cubit/search_cubit.dart';
 import '../api/dio_client.dart';
 
 final getIt = GetIt.instance;
@@ -75,6 +80,33 @@ Future<void> setupLocator() async {
     () => MovieDetailsBloc(
       getMovieDetails: getIt<GetMovieDetails>(),
       getMovieSuggestions: getIt<GetMovieSuggestions>(),
+    ),
+  );
+  // ==================== SEARCH FEATURE ====================
+
+// Data Sources
+  getIt.registerLazySingleton<SearchRemoteDataSource>(
+        () => SearchRemoteDataSourceImpl(dio: getIt()),
+  );
+
+// Repositories
+  getIt.registerLazySingleton<SearchRepository>(
+        () => SearchRepositoryImpl(
+      remoteDataSource: getIt<SearchRemoteDataSource>(),
+    ),
+  );
+
+// UseCases
+// UseCase
+  getIt.registerLazySingleton<SearchMoviesUseCase>(
+        () => SearchMoviesUseCase(
+      repository: getIt<SearchRepository>(),
+    ),
+  );
+// Cubit
+  getIt.registerFactory<SearchCubit>(
+        () => SearchCubit(
+      searchMoviesUseCase: getIt<SearchMoviesUseCase>(),
     ),
   );
 }
