@@ -1,4 +1,8 @@
 import 'package:get_it/get_it.dart';
+import '../../features/browse/data/datasources/browse_remote_data_source.dart';
+import '../../features/browse/data/repositories/browse_repository_impl.dart';
+import '../../features/browse/domain/repositories/browse_repository.dart';
+import '../../features/browse/presentation/cubit/browse_cubit.dart';
 import '../../features/home/data/dataSource/movie_remote_data_source.dart';
 import '../../features/home/data/repositories/movie_repository_impl.dart';
 import '../../features/home/domain/repositories/movie_repository.dart';
@@ -108,6 +112,32 @@ Future<void> setupLocator() async {
         () => SearchCubit(
       searchMoviesUseCase: getIt<SearchMoviesUseCase>(),
     ),
+  );
+
+// ==================== BROWSE FEATURE ====================
+
+
+
+  // Data Sources
+  getIt.registerLazySingleton<BrowseRemoteDataSource>(
+        () => BrowseRemoteDataSourceImpl(getIt()),
+  );
+
+// Repositories
+  getIt.registerLazySingleton<BrowseRepository>(
+        () => BrowseRepositoryImpl(
+      getIt<BrowseRemoteDataSource>(),
+    ),
+  );
+
+// // UseCases
+//   getIt.registerLazySingleton<GetMoviesByGenre>(
+//         () => GetMoviesByGenre(getIt<MovieRepository>()),
+//   );
+
+// Cubit
+  getIt.registerFactory<BrowseCubit>(
+        () => BrowseCubit(getIt<GetMoviesByGenre>()),
   );
 }
 

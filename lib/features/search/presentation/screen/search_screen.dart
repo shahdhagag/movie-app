@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../config/routes/app_routes.dart';
 import '../../../../core/di/injection_conatiner.dart';
 import '../../../../core/utils/app_assets.dart';
+import '../../../../core/utils/app_colors.dart';
 import '../../../home/presentation/widgets/movie_card.dart';
 import '../cubit/search_cubit.dart';
 import '../cubit/search_state.dart';
@@ -39,7 +40,7 @@ class SearchScreen extends StatelessWidget {
                         /// LOADING
                         if (state is SearchLoading) {
                           return const Center(
-                              child: CircularProgressIndicator());
+                              child: CircularProgressIndicator(color: AppColors.primary,));
                         }
 
                         /// SUCCESS

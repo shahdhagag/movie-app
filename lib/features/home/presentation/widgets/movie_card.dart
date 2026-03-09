@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../../core/utils/app_colors.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 
 class MovieCard extends StatelessWidget {
   final String imagePath;
@@ -25,48 +26,60 @@ class MovieCard extends StatelessWidget {
       child: Container(
         width: width.w,
         height: height.h,
-        margin: EdgeInsets.only(right: 16.w),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(10.r),
-          image: DecorationImage(
-            image: NetworkImage(imagePath),
-            fit: BoxFit.cover,
-          ),
+          color: Colors.grey[900],
         ),
-        child: Stack(
-          children: [
-            // Rating Badge
-            Positioned(
-              top: 10.h,
-              left: 10.w,
-              child: Container(
-                padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
-                decoration: BoxDecoration(
-                  color: AppColors.background.withValues(alpha: 0.7),
-                  borderRadius: BorderRadius.circular(8.r),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      rating.toString(),
-                      style: TextStyle(
-                        color: AppColors.textPrimary,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 12.sp,
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(10.r),
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              /// POSTER IMAGE WITH FADE-IN
+              imagePath.isNotEmpty
+                  ? FadeInImage.assetNetwork(
+                placeholder: 'assets/images/emptyStates/place_holder.jpg',
+                image: imagePath,
+                fit: BoxFit.cover,
+                imageErrorBuilder: (context, error, stackTrace) =>
+                const Center(child: Icon(Icons.broken_image, color: Colors.grey)),
+                fadeInDuration: const Duration(milliseconds: 300),
+              )
+                  : const SizedBox.shrink(),
+
+              /// RATING BADGE
+              Positioned(
+                top: 10.h,
+                left: 10.w,
+                child: Container(
+                  padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
+                  decoration: BoxDecoration(
+                    color: Colors.black.withOpacity(0.7),
+                    borderRadius: BorderRadius.circular(8.r),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        rating.toString(),
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 12.sp,
+                        ),
                       ),
-                    ),
-                    SizedBox(width: 4.w),
-                    Icon(
-                      Icons.star,
-                      color: AppColors.primary,
-                      size: 14.sp,
-                    ),
-                  ],
+                      SizedBox(width: 4.w),
+                      Icon(
+                        Icons.star,
+                        color: Colors.amber,
+                        size: 14.sp,
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
