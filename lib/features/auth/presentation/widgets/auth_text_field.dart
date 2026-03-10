@@ -3,7 +3,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../../core/utils/app_colors.dart';
 import '../../../../core/utils/app_styles.dart';
 
-/// Custom text field widget for auth forms
 class AuthTextField extends StatefulWidget {
   final String label;
   final String hintText;
