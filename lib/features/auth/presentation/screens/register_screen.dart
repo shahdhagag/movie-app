@@ -113,7 +113,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       key: _formKey,
                       child: Column(
                         children: [
-                          // Avatar selection (placeholder)
                           Center(
                             child: Column(
                               children: [
@@ -140,7 +139,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             ),
                           ),
 
-                          // Name field
                           AuthTextField(
                             label: 'Name',
                             hintText: 'Enter your full name',
@@ -150,7 +148,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           ),
                           SizedBox(height: 20.h),
 
-                          // Email field
                           AuthTextField(
                             label: 'Email',
                             hintText: 'Enter your email',
@@ -161,7 +158,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           ),
                           SizedBox(height: 20.h),
 
-                          // Phone field
                           AuthTextField(
                             label: 'Phone Number',
                             hintText: 'Enter your phone number',
@@ -172,7 +168,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           ),
                           SizedBox(height: 20.h),
 
-                          // Password field
                           AuthTextField(
                             label: 'Password',
                             hintText: 'Enter your password',
@@ -196,7 +191,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           ),
                           SizedBox(height: 30.h),
 
-                          // Register button
                           SizedBox(
                             width: double.infinity,
                             height: 50.h,
@@ -225,7 +219,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           ),
                           SizedBox(height: 20.h),
 
-                          // Login link
                           Center(
                             child: RichText(
                               text: TextSpan(
