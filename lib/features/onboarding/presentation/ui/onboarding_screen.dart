@@ -58,6 +58,8 @@ class OnboardingScreen extends StatelessWidget {
         builder: (context, state) {
           return Scaffold(
             body: PageView.builder(
+
+
               controller: controller,
               physics: const NeverScrollableScrollPhysics(),
               itemCount: pages.length,
