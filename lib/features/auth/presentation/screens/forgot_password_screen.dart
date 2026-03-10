@@ -1,5 +1,3 @@
-import 'package:flutter/gestures.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -12,38 +10,34 @@ import '../../presentation/bloc/auth_event.dart';
 import '../../presentation/bloc/auth_state.dart';
 import '../widgets/auth_text_field.dart';
 
-class LoginScreen extends StatefulWidget {
-  const LoginScreen({Key? key}) : super(key: key);
+class ForgotPasswordScreen extends StatefulWidget {
+  const ForgotPasswordScreen({Key? key}) : super(key: key);
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  State<ForgotPasswordScreen> createState() => _ForgotPasswordScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   late TextEditingController _emailController;
-  late TextEditingController _passwordController;
   final _formKey = GlobalKey<FormState>();
 
   @override
   void initState() {
     super.initState();
     _emailController = TextEditingController();
-    _passwordController = TextEditingController();
   }
 
   @override
   void dispose() {
     _emailController.dispose();
-    _passwordController.dispose();
     super.dispose();
   }
 
-  void _handleLogin() {
+  void _handleForgotPassword() {
     if (_formKey.currentState!.validate()) {
       context.read<AuthBloc>().add(
-            LoginEvent(
+            ForgotPasswordEvent(
               email: _emailController.text.trim(),
-              password: _passwordController.text,
             ),
           );
     }
@@ -54,12 +48,15 @@ class _LoginScreenState extends State<LoginScreen> {
     return Scaffold(
       body: BlocListener<AuthBloc, AuthState>(
         listener: (context, state) {
-          if (state is AuthSuccess) {
+          if (state is PasswordResetEmailSent) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(content: Text(state.message)),
             );
-            // Navigate to home screen
-            context.go('/main');
+            Future.delayed(const Duration(seconds: 2), () {
+              if (context.mounted) {
+                context.pop();
+              }
+            });
           } else if (state is AuthError) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
@@ -89,87 +86,55 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     SizedBox(height: 40.h),
 
-                    // Play icon
-                    Center(
-                      child: Container(
-                        width: 80.w,
-                        height: 80.w,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color: AppColors.primary,
-                            width: 3.w,
-                          ),
-                        ),
-                        child: Center(
-                          child: Icon(
-                            Icons.play_arrow_rounded,
-                            color: AppColors.primary,
-                            size: 40.sp,
-                          ),
-                        ),
-                      ),
-                    ),
-                    SizedBox(height: 40.h),
-
                     // Title
                     Center(
                       child: Text(
-                        'Login',
+                        'Forget Password',
                         style: AppStyles.h2,
                       ),
                     ),
-                    SizedBox(height: 40.h),
+                    SizedBox(height: 60.h),
+
+                    Center(
+                      child: Container(
+                        width: 200.w,
+                        height: 200.w,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: AppColors.grey,
+                        ),
+                        child: Icon(
+                          Icons.lock_outline_rounded,
+                          color: AppColors.textTertiary,
+                          size: 80.sp,
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 60.h),
 
                     // Form
                     Form(
                       key: _formKey,
                       child: Column(
                         children: [
-                          // Email field
                           AuthTextField(
                             label: 'Email',
-                            hintText: 'Enter your email',
+                            hintText: 'Enter your email address',
                             controller: _emailController,
                             prefixIcon: Icons.mail_outline_rounded,
                             keyboardType: TextInputType.emailAddress,
                             validator: AppValidators.validateEmail,
                           ),
-                          SizedBox(height: 20.h),
-
-                          // Password field
-                          AuthTextField(
-                            label: 'Password',
-                            hintText: 'Enter your password',
-                            controller: _passwordController,
-                            prefixIcon: Icons.lock_outline_rounded,
-                            isPassword: true,
-                            validator: AppValidators.validatePassword,
-                          ),
-                          SizedBox(height: 12.h),
-
-                          // Forgot password
-                          Align(
-                            alignment: Alignment.centerRight,
-                            child: GestureDetector(
-                              onTap: () => context.push('/forgot-password'),
-                              child: Text(
-                                'Forgot Password ?',
-                                style: AppStyles.h5.copyWith(
-                                  fontSize: 14.sp,
-                                  color: AppColors.primary,
-                                ),
-                              ),
-                            ),
-                          ),
                           SizedBox(height: 30.h),
 
-                          // Login button
+                          // Verify button
                           SizedBox(
                             width: double.infinity,
                             height: 50.h,
                             child: ElevatedButton(
-                              onPressed: state is AuthLoading ? null : _handleLogin,
+                              onPressed: state is AuthLoading
+                                  ? null
+                                  : _handleForgotPassword,
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: AppColors.primary,
                                 disabledBackgroundColor: AppColors.textTertiary,
@@ -183,40 +148,12 @@ class _LoginScreenState extends State<LoginScreen> {
                                       ),
                                     )
                                   : Text(
-                                      'Login',
+                                      'Verify Email',
                                       style: AppStyles.h5.copyWith(
                                         fontSize: 16.sp,
                                         color: AppColors.textSecondary,
                                       ),
                                     ),
-                            ),
-                          ),
-                          SizedBox(height: 20.h),
-
-                          // Register link
-                          Center(
-                            child: RichText(
-                              text: TextSpan(
-                                text: "Don't Have Account ? ",
-                                style: AppStyles.h5.copyWith(
-                                  fontSize: 14.sp,
-                                  color: AppColors.textTertiary,
-                                ),
-                                children: [
-                                  TextSpan(
-                                    text: 'Create One',
-                                    style: AppStyles.h5.copyWith(
-                                      fontSize: 14.sp,
-                                      color: AppColors.primary,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                    recognizer: TapGestureRecognizer()
-                                      ..onTap = () {
-                                        context.push('/register');
-                                      },
-                                  ),
-                                ],
-                              ),
                             ),
                           ),
                         ],
@@ -232,3 +169,5 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 }
+
+

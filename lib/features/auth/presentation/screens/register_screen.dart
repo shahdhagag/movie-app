@@ -1,5 +1,4 @@
 import 'package:flutter/gestures.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -12,38 +11,49 @@ import '../../presentation/bloc/auth_event.dart';
 import '../../presentation/bloc/auth_state.dart';
 import '../widgets/auth_text_field.dart';
 
-class LoginScreen extends StatefulWidget {
-  const LoginScreen({Key? key}) : super(key: key);
+class RegisterScreen extends StatefulWidget {
+  const RegisterScreen({Key? key}) : super(key: key);
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  State<RegisterScreen> createState() => _RegisterScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _RegisterScreenState extends State<RegisterScreen> {
+  late TextEditingController _nameController;
   late TextEditingController _emailController;
+  late TextEditingController _phoneController;
   late TextEditingController _passwordController;
+  late TextEditingController _confirmPasswordController;
   final _formKey = GlobalKey<FormState>();
 
   @override
   void initState() {
     super.initState();
+    _nameController = TextEditingController();
     _emailController = TextEditingController();
+    _phoneController = TextEditingController();
     _passwordController = TextEditingController();
+    _confirmPasswordController = TextEditingController();
   }
 
   @override
   void dispose() {
+    _nameController.dispose();
     _emailController.dispose();
+    _phoneController.dispose();
     _passwordController.dispose();
+    _confirmPasswordController.dispose();
     super.dispose();
   }
 
-  void _handleLogin() {
+  void _handleRegister() {
     if (_formKey.currentState!.validate()) {
       context.read<AuthBloc>().add(
-            LoginEvent(
+            RegisterEvent(
               email: _emailController.text.trim(),
               password: _passwordController.text,
+              name: _nameController.text.trim(),
+              phoneNumber: _phoneController.text.trim(),
             ),
           );
     }
@@ -58,8 +68,8 @@ class _LoginScreenState extends State<LoginScreen> {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(content: Text(state.message)),
             );
-            // Navigate to home screen
-            context.go('/main');
+            // Navigate to login screen
+            context.go('/login');
           } else if (state is AuthError) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
@@ -87,45 +97,59 @@ class _LoginScreenState extends State<LoginScreen> {
                         size: 24.sp,
                       ),
                     ),
-                    SizedBox(height: 40.h),
-
-                    // Play icon
-                    Center(
-                      child: Container(
-                        width: 80.w,
-                        height: 80.w,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color: AppColors.primary,
-                            width: 3.w,
-                          ),
-                        ),
-                        child: Center(
-                          child: Icon(
-                            Icons.play_arrow_rounded,
-                            color: AppColors.primary,
-                            size: 40.sp,
-                          ),
-                        ),
-                      ),
-                    ),
-                    SizedBox(height: 40.h),
+                    SizedBox(height: 30.h),
 
                     // Title
                     Center(
                       child: Text(
-                        'Login',
+                        'Register',
                         style: AppStyles.h2,
                       ),
                     ),
-                    SizedBox(height: 40.h),
+                    SizedBox(height: 30.h),
 
                     // Form
                     Form(
                       key: _formKey,
                       child: Column(
                         children: [
+                          // Avatar selection (placeholder)
+                          Center(
+                            child: Column(
+                              children: [
+                                Text(
+                                  'Avatar',
+                                  style: AppStyles.h5.copyWith(fontSize: 14.sp),
+                                ),
+                                SizedBox(height: 12.h),
+                                Container(
+                                  width: 60.w,
+                                  height: 60.w,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: AppColors.grey,
+                                  ),
+                                  child: Icon(
+                                    Icons.person,
+                                    color: AppColors.textTertiary,
+                                    size: 30.sp,
+                                  ),
+                                ),
+                                SizedBox(height: 20.h),
+                              ],
+                            ),
+                          ),
+
+                          // Name field
+                          AuthTextField(
+                            label: 'Name',
+                            hintText: 'Enter your full name',
+                            controller: _nameController,
+                            prefixIcon: Icons.person_outline_rounded,
+                            validator: AppValidators.validateName,
+                          ),
+                          SizedBox(height: 20.h),
+
                           // Email field
                           AuthTextField(
                             label: 'Email',
@@ -134,6 +158,17 @@ class _LoginScreenState extends State<LoginScreen> {
                             prefixIcon: Icons.mail_outline_rounded,
                             keyboardType: TextInputType.emailAddress,
                             validator: AppValidators.validateEmail,
+                          ),
+                          SizedBox(height: 20.h),
+
+                          // Phone field
+                          AuthTextField(
+                            label: 'Phone Number',
+                            hintText: 'Enter your phone number',
+                            controller: _phoneController,
+                            prefixIcon: Icons.phone_outlined,
+                            keyboardType: TextInputType.phone,
+                            validator: AppValidators.validatePhone,
                           ),
                           SizedBox(height: 20.h),
 
@@ -146,30 +181,27 @@ class _LoginScreenState extends State<LoginScreen> {
                             isPassword: true,
                             validator: AppValidators.validatePassword,
                           ),
-                          SizedBox(height: 12.h),
+                          SizedBox(height: 20.h),
 
-                          // Forgot password
-                          Align(
-                            alignment: Alignment.centerRight,
-                            child: GestureDetector(
-                              onTap: () => context.push('/forgot-password'),
-                              child: Text(
-                                'Forgot Password ?',
-                                style: AppStyles.h5.copyWith(
-                                  fontSize: 14.sp,
-                                  color: AppColors.primary,
-                                ),
-                              ),
+                          AuthTextField(
+                            label: 'Confirm Password',
+                            hintText: 'Confirm your password',
+                            controller: _confirmPasswordController,
+                            prefixIcon: Icons.lock_outline_rounded,
+                            isPassword: true,
+                            validator: (value) => AppValidators.validateConfirmPassword(
+                              value,
+                              _passwordController.text,
                             ),
                           ),
                           SizedBox(height: 30.h),
 
-                          // Login button
+                          // Register button
                           SizedBox(
                             width: double.infinity,
                             height: 50.h,
                             child: ElevatedButton(
-                              onPressed: state is AuthLoading ? null : _handleLogin,
+                              onPressed: state is AuthLoading ? null : _handleRegister,
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: AppColors.primary,
                                 disabledBackgroundColor: AppColors.textTertiary,
@@ -183,7 +215,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                       ),
                                     )
                                   : Text(
-                                      'Login',
+                                      'Create Account',
                                       style: AppStyles.h5.copyWith(
                                         fontSize: 16.sp,
                                         color: AppColors.textSecondary,
@@ -193,18 +225,18 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                           SizedBox(height: 20.h),
 
-                          // Register link
+                          // Login link
                           Center(
                             child: RichText(
                               text: TextSpan(
-                                text: "Don't Have Account ? ",
+                                text: 'Already Have Account ? ',
                                 style: AppStyles.h5.copyWith(
                                   fontSize: 14.sp,
                                   color: AppColors.textTertiary,
                                 ),
                                 children: [
                                   TextSpan(
-                                    text: 'Create One',
+                                    text: 'Login',
                                     style: AppStyles.h5.copyWith(
                                       fontSize: 14.sp,
                                       color: AppColors.primary,
@@ -212,13 +244,14 @@ class _LoginScreenState extends State<LoginScreen> {
                                     ),
                                     recognizer: TapGestureRecognizer()
                                       ..onTap = () {
-                                        context.push('/register');
+                                        context.push('/login');
                                       },
                                   ),
                                 ],
                               ),
                             ),
                           ),
+                          SizedBox(height: 40.h),
                         ],
                       ),
                     ),
@@ -232,3 +265,5 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 }
+
+

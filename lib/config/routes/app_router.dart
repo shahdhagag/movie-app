@@ -1,5 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import '../../core/di/injection_conatiner.dart';
+import '../../features/auth/presentation/bloc/auth_bloc.dart';
+import '../../features/auth/presentation/screens/forgot_password_screen.dart';
+import '../../features/auth/presentation/screens/login_screen.dart';
+import '../../features/auth/presentation/screens/register_screen.dart';
 import '../../features/onboarding/presentation/ui/onboarding_screen.dart';
 import 'package:movie/features/home/presentation/screens/home_screen.dart';
 import '../../features/browse/presentation/screen/browes_screen.dart';
@@ -39,17 +45,26 @@ class AppRouter {
       GoRoute(
         path: AppRoutes.login,
         name: 'login',
-        builder: (context, state) => const Placeholder(), // TODO: Replace with LoginScreen
+        builder: (context, state) => BlocProvider<AuthBloc>(
+          create: (context) => getIt<AuthBloc>(),
+          child: const LoginScreen(),
+        ),
       ),
       GoRoute(
         path: AppRoutes.register,
         name: 'register',
-        builder: (context, state) => const Placeholder(), // TODO: Replace with RegisterScreen
+        builder: (context, state) => BlocProvider<AuthBloc>(
+          create: (context) => getIt<AuthBloc>(),
+          child: const RegisterScreen(),
+        ),
       ),
       GoRoute(
         path: AppRoutes.forgotPassword,
         name: 'forgotPassword',
-        builder: (context, state) => const Placeholder(), // TODO: Replace with ForgotPasswordScreen
+        builder: (context, state) => BlocProvider<AuthBloc>(
+          create: (context) => getIt<AuthBloc>(),
+          child: const ForgotPasswordScreen(),
+        ),
       ),
 
 
