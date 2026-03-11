@@ -27,5 +27,7 @@ abstract class AuthRepository {
     required String displayName,
     required String? photoUrl,
   });
+
+  Future<Either<Failure, AuthUser>> signInWithGoogle();
 }
 

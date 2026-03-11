@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:movie/core/utils/app_assets.dart';
 import '../../../../core/utils/app_colors.dart';
 import '../../../../core/utils/app_styles.dart';
 import '../../../../core/utils/app_validators.dart';
@@ -41,11 +42,11 @@ class _LoginScreenState extends State<LoginScreen> {
   void _handleLogin() {
     if (_formKey.currentState!.validate()) {
       context.read<AuthBloc>().add(
-            LoginEvent(
-              email: _emailController.text.trim(),
-              password: _passwordController.text,
-            ),
-          );
+        LoginEvent(
+          email: _emailController.text.trim(),
+          password: _passwordController.text,
+        ),
+      );
     }
   }
 
@@ -55,9 +56,9 @@ class _LoginScreenState extends State<LoginScreen> {
       body: BlocListener<AuthBloc, AuthState>(
         listener: (context, state) {
           if (state is AuthSuccess) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(state.message)),
-            );
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(SnackBar(content: Text(state.message)));
             // Navigate to home screen
             context.go('/main');
           } else if (state is AuthError) {
@@ -91,34 +92,17 @@ class _LoginScreenState extends State<LoginScreen> {
 
                     // Play icon
                     Center(
-                      child: Container(
-                        width: 80.w,
-                        height: 80.w,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color: AppColors.primary,
-                            width: 3.w,
-                          ),
-                        ),
-                        child: Center(
-                          child: Icon(
-                            Icons.play_arrow_rounded,
-                            color: AppColors.primary,
-                            size: 40.sp,
-                          ),
+                      child: Center(
+                        child: Image.asset(
+                          AppAssets.appLogo,
+                          height: 118.h,
+                          width: 120.w,
                         ),
                       ),
                     ),
                     SizedBox(height: 40.h),
 
-                    // Title
-                    Center(
-                      child: Text(
-                        'Login',
-                        style: AppStyles.h2,
-                      ),
-                    ),
+                    Center(child: Text('Login', style: AppStyles.h2)),
                     SizedBox(height: 40.h),
 
                     // Form
@@ -128,10 +112,9 @@ class _LoginScreenState extends State<LoginScreen> {
                         children: [
                           // Email field
                           AuthTextField(
-                            label: 'Email',
-                            hintText: 'Enter your email',
+                            hintText: ' Email',
                             controller: _emailController,
-                            prefixIcon: Icons.mail_outline_rounded,
+                            prefixIcon: Image.asset(AppAssets.emailIcon,width: 3.w,height: 25.h,),
                             keyboardType: TextInputType.emailAddress,
                             validator: AppValidators.validateEmail,
                           ),
@@ -139,10 +122,10 @@ class _LoginScreenState extends State<LoginScreen> {
 
                           // Password field
                           AuthTextField(
-                            label: 'Password',
-                            hintText: 'Enter your password',
+
+                            hintText: ' Password',
                             controller: _passwordController,
-                            prefixIcon: Icons.lock_outline_rounded,
+                            prefixIcon:Image.asset(AppAssets.passwordIcon,width: 3.w,height: 25.h),
                             isPassword: true,
                             validator: AppValidators.validatePassword,
                           ),
@@ -169,7 +152,9 @@ class _LoginScreenState extends State<LoginScreen> {
                             width: double.infinity,
                             height: 50.h,
                             child: ElevatedButton(
-                              onPressed: state is AuthLoading ? null : _handleLogin,
+                              onPressed: state is AuthLoading
+                                  ? null
+                                  : _handleLogin,
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: AppColors.primary,
                                 disabledBackgroundColor: AppColors.textTertiary,
@@ -179,7 +164,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                       height: 24.h,
                                       width: 24.h,
                                       child: const CircularProgressIndicator(
-                                        color: AppColors.background,
+                                        color: AppColors.primary,
                                       ),
                                     )
                                   : Text(
@@ -217,6 +202,84 @@ class _LoginScreenState extends State<LoginScreen> {
                                   ),
                                 ],
                               ),
+                            ),
+                          ),
+                          SizedBox(height: 30.h),
+
+                          // OR Divider
+                          Row(
+                            children: [
+                              Expanded(
+                                child: Divider(
+                                  color: AppColors.primary.withOpacity(0.3),
+                                  thickness: 1,
+                                ),
+                              ),
+                              Padding(
+                                padding: EdgeInsets.symmetric(horizontal: 12.w),
+                                child: Text(
+                                  'OR',
+                                  style: AppStyles.h5.copyWith(
+                                    fontSize: 14.sp,
+                                    color: AppColors.primary,
+                                  ),
+                                ),
+                              ),
+                              Expanded(
+                                child: Divider(
+                                  color: AppColors.textTertiary.withOpacity(0.3),
+                                  thickness: 2,
+                                ),
+                              ),
+                            ],
+                          ),
+                          SizedBox(height: 30.h),
+
+                          // Google Sign-In Button
+                          SizedBox(
+                            width: double.infinity,
+                            height: 50.h,
+                            child: ElevatedButton(
+                              onPressed: state is AuthLoading
+                                  ? null
+                                  : () {
+                                      context.read<AuthBloc>().add(
+                                            const GoogleSignInEvent(),
+                                          );
+                                    },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: AppColors.primary,
+                                disabledBackgroundColor: AppColors.textTertiary,
+                              ),
+                              child: state is AuthLoading
+                                  ? SizedBox(
+                                      height: 24.h,
+                                      width: 24.h,
+                                      child: const CircularProgressIndicator(
+                                        color: AppColors.primary,
+                                      ),
+                                    )
+                                  : Row(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        Text(
+                                          'G',
+                                          style: AppStyles.h5.copyWith(
+                                            color: AppColors.textSecondary,
+                                            fontSize: 20.sp,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                        SizedBox(width: 12.w),
+                                        Text(
+                                          'Login With Google',
+                                          style: AppStyles.h5.copyWith(
+                                            fontSize: 16.sp,
+                                            color: AppColors.textSecondary,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                             ),
                           ),
                         ],

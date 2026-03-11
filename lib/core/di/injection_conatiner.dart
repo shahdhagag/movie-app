@@ -4,6 +4,7 @@ import '../../features/auth/data/datasources/auth_remote_data_source.dart';
 import '../../features/auth/data/repositories/auth_repository_impl.dart';
 import '../../features/auth/domain/repositories/auth_repository.dart';
 import '../../features/auth/domain/usecases/forgot_password_usecase.dart';
+import '../../features/auth/domain/usecases/google_sign_in_usecase.dart';
 import '../../features/auth/domain/usecases/login_usecase.dart';
 import '../../features/auth/domain/usecases/logout_usecase.dart';
 import '../../features/auth/domain/usecases/register_usecase.dart';
@@ -62,6 +63,9 @@ Future<void> setupLocator() async {
   getIt.registerLazySingleton<ForgotPasswordUseCase>(
     () => ForgotPasswordUseCase(getIt<AuthRepository>()),
   );
+  getIt.registerLazySingleton<GoogleSignInUseCase>(
+    () => GoogleSignInUseCase(getIt<AuthRepository>()),
+  );
 
   // BLoCs
   getIt.registerFactory<AuthBloc>(
@@ -70,6 +74,7 @@ Future<void> setupLocator() async {
       registerUseCase: getIt<RegisterUseCase>(),
       logoutUseCase: getIt<LogoutUseCase>(),
       forgotPasswordUseCase: getIt<ForgotPasswordUseCase>(),
+      googleSignInUseCase: getIt<GoogleSignInUseCase>(),
     ),
   );
 

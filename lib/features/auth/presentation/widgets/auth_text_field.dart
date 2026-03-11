@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+
 import '../../../../core/utils/app_colors.dart';
 import '../../../../core/utils/app_styles.dart';
 
 class AuthTextField extends StatefulWidget {
-  final String label;
+  final String? label;
   final String hintText;
   final TextEditingController controller;
-  final IconData? prefixIcon;
+  final Widget? prefixIcon;
   final String? Function(String?)? validator;
   final TextInputType keyboardType;
   final bool isPassword;
@@ -16,7 +17,7 @@ class AuthTextField extends StatefulWidget {
 
   const AuthTextField({
     Key? key,
-    required this.label,
+    this.label,
     required this.hintText,
     required this.controller,
     this.prefixIcon,
@@ -45,11 +46,10 @@ class _AuthTextFieldState extends State<AuthTextField> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          widget.label,
-          style: AppStyles.h5.copyWith(fontSize: 14.sp),
-        ),
-        SizedBox(height: 8.h),
+        if (widget.label != null) ...[
+          Text(widget.label!, style: AppStyles.h5.copyWith(fontSize: 14.sp)),
+          SizedBox(height: 8.h),
+        ],
         TextFormField(
           controller: widget.controller,
           validator: widget.validator,
@@ -65,33 +65,40 @@ class _AuthTextFieldState extends State<AuthTextField> {
               color: AppColors.textTertiary,
             ),
             prefixIcon: widget.prefixIcon != null
-                ? Icon(
-                    widget.prefixIcon,
-                    color: AppColors.textTertiary,
-                    size: 20.sp,
-                  )
+                ? Padding(
+              padding: EdgeInsets.all(12.w),
+              child: widget.prefixIcon,
+            )
                 : null,
             suffixIcon: widget.isPassword
                 ? IconButton(
-                    icon: Icon(
-                      _obscureText
-                          ? Icons.visibility_off_rounded
-                          : Icons.visibility_rounded,
-                      color: AppColors.textTertiary,
-                      size: 20.sp,
-                    ),
-                    onPressed: () {
-                      setState(() {
-                        _obscureText = !_obscureText;
-                      });
-                    },
-                  )
+              icon: Icon(
+                _obscureText
+                    ? Icons.visibility_off_rounded
+                    : Icons.visibility_rounded,
+                color: AppColors.textTertiary,
+                size: 20.sp,
+              ),
+              onPressed: () {
+                setState(() {
+                  _obscureText = !_obscureText;
+                });
+              },
+            )
                 : null,
             filled: true,
             fillColor: AppColors.grey,
             border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12.r),
+              borderRadius: BorderRadius.circular(15.r),
               borderSide: BorderSide.none,
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(15.r),
+              borderSide: BorderSide.none,
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(15.r),
+              borderSide: BorderSide(color: AppColors.primary, width: 1),
             ),
             contentPadding: EdgeInsets.symmetric(
               horizontal: 16.w,
@@ -107,4 +114,3 @@ class _AuthTextFieldState extends State<AuthTextField> {
     );
   }
 }
-

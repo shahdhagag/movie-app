@@ -117,5 +117,17 @@ class AuthRepositoryImpl implements AuthRepository {
       return Left(AuthFailure('Failed to update profile: ${e.toString()}'));
     }
   }
+
+  @override
+  Future<Either<Failure, AuthUser>> signInWithGoogle() async {
+    try {
+      final user = await remoteDataSource.signInWithGoogle();
+      return Right(user);
+    } on AuthException catch (e) {
+      return Left(AuthFailure(e.toString()));
+    } on Exception catch (e) {
+      return Left(AuthFailure('Google sign in failed: ${e.toString()}'));
+    }
+  }
 }
 

@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import '../../../../core/errors/exceptions.dart';
 import '../models/auth_user_model.dart';
 
@@ -27,6 +28,8 @@ abstract class AuthRemoteDataSource {
     required String displayName,
     required String? photoUrl,
   });
+
+  Future<AuthUserModel> signInWithGoogle();
 }
 
 class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
@@ -207,6 +210,58 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         return AuthException('This user account has been disabled');
       default:
         return AuthException('Authentication error: ${e.message}');
+    }
+  }
+
+  @override
+  Future<AuthUserModel> signInWithGoogle() async {
+    try {
+      final GoogleSignIn googleSignIn = GoogleSignIn();
+
+      // Check if user is already signed in and sign out
+      final isSignedIn = await googleSignIn.isSignedIn();
+      if (isSignedIn) {
+        await googleSignIn.signOut();
+      }
+
+      // Sign in with Google
+      final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
+
+      if (googleUser == null) {
+        throw AuthException('Google sign in was cancelled');
+      }
+
+      // Get authentication details
+      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+
+      // Create credential for Firebase
+      final credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
+
+      // Sign in to Firebase with the Google credential
+      final userCredential = await _firebaseAuth.signInWithCredential(credential);
+
+      final user = userCredential.user;
+      if (user == null) {
+        throw AuthException('Failed to sign in with Google');
+      }
+
+      return AuthUserModel(
+        uid: user.uid,
+        email: user.email ?? '',
+        displayName: user.displayName ?? '',
+        phoneNumber: user.phoneNumber ?? '',
+        isEmailVerified: user.emailVerified,
+        photoUrl: user.photoURL,
+      );
+    } on AuthException {
+      rethrow;
+    } on FirebaseAuthException catch (e) {
+      throw _handleFirebaseAuthException(e);
+    } catch (e) {
+      throw AuthException('Google sign in failed: ${e.toString()}');
     }
   }
 }

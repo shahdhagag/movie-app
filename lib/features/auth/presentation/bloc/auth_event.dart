@@ -58,3 +58,7 @@ class ClearAuthStateEvent extends AuthEvent {
   const ClearAuthStateEvent();
 }
 
+class GoogleSignInEvent extends AuthEvent {
+  const GoogleSignInEvent();
+}
+
