@@ -121,7 +121,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     Center(
                       child: Text(
                         'Register',
-                        style: AppStyles.h2,
+                        style: AppStyles.h2.copyWith(
+                          fontSize: 16.sp,
+                          color: AppColors.primary
+                        ),
                       ),
                     ),
                     SizedBox(height: 30.h),
@@ -135,10 +138,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           Center(
                             child: Column(
                               children: [
-                                Text(
-                                  'Avatar',
-                                  style: AppStyles.h5.copyWith(fontSize: 14.sp),
-                                ),
                                 SizedBox(height: 16.h),
                                 CarouselSlider(
                                   options: CarouselOptions(
@@ -187,6 +186,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                     );
                                   }).toList(),
                                 ),
+                                SizedBox(height: 14.h),
+
+                                Text(
+                                  'Avatar',
+                                  style: AppStyles.h5.copyWith(fontSize: 14.sp),
+                                ),
+
                                 SizedBox(height: 20.h),
                               ],
                             ),

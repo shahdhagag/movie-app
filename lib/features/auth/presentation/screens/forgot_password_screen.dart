@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:movie/core/utils/app_assets.dart';
 import '../../../../core/utils/app_colors.dart';
 import '../../../../core/utils/app_styles.dart';
 import '../../../../core/utils/app_validators.dart';
@@ -36,10 +37,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   void _handleForgotPassword() {
     if (_formKey.currentState!.validate()) {
       context.read<AuthBloc>().add(
-            ForgotPasswordEvent(
-              email: _emailController.text.trim(),
-            ),
-          );
+        ForgotPasswordEvent(email: _emailController.text.trim()),
+      );
     }
   }
 
@@ -49,9 +48,9 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
       body: BlocListener<AuthBloc, AuthState>(
         listener: (context, state) {
           if (state is PasswordResetEmailSent) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(state.message)),
-            );
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(SnackBar(content: Text(state.message)));
             Future.delayed(const Duration(seconds: 2), () {
               if (context.mounted) {
                 context.pop();
@@ -90,24 +89,19 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                     Center(
                       child: Text(
                         'Forget Password',
-                        style: AppStyles.h2,
+                        style: AppStyles.h2.copyWith(
+                          fontSize: 16.sp,
+                          color: AppColors.primary,
+                        ),
                       ),
                     ),
                     SizedBox(height: 60.h),
 
                     Center(
-                      child: Container(
-                        width: 200.w,
-                        height: 200.w,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: AppColors.grey,
-                        ),
-                        child: Icon(
-                          Icons.lock_outline_rounded,
-                          color: AppColors.textTertiary,
-                          size: 80.sp,
-                        ),
+                      child: Image.asset(
+                        AppAssets.forgotPasswordBackground,
+                        width: 400.w,
+                        height: 400.h,
                       ),
                     ),
                     SizedBox(height: 60.h),
@@ -118,10 +112,13 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                       child: Column(
                         children: [
                           AuthTextField(
-                            label: 'Email',
-                            hintText: 'Enter your email address',
+                            hintText: 'Email',
                             controller: _emailController,
-                            // prefixIcon: Icons.mail_outline_rounded,
+                            prefixIcon: Image.asset(
+                              AppAssets.emailIcon,
+                              width: 3.w,
+                              height: 25.h,
+                            ),
                             keyboardType: TextInputType.emailAddress,
                             validator: AppValidators.validateEmail,
                           ),
@@ -169,5 +166,3 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     );
   }
 }
-
-
