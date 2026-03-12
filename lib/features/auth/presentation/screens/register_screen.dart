@@ -28,7 +28,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
   late TextEditingController _confirmPasswordController;
   final _formKey = GlobalKey<FormState>();
 
-  // Avatar list
   final List<String> _avatarList = [
     AppAssets.avatar1,
     AppAssets.avatar2,
@@ -106,7 +105,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     SizedBox(height: 60.h),
-                    // Back button
                     GestureDetector(
                       onTap: () => context.pop(),
                       child: Icon(
@@ -116,8 +114,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       ),
                     ),
                     SizedBox(height: 30.h),
-
-                    // Title
                     Center(
                       child: Text(
                         'Register',
@@ -129,12 +125,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     ),
                     SizedBox(height: 30.h),
 
-                    // Form
                     Form(
                       key: _formKey,
                       child: Column(
                         children: [
-                          // Avatar Selection with CarouselSlider
                           Center(
                             child: Column(
                               children: [

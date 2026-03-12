@@ -74,7 +74,6 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     SizedBox(height: 60.h),
-                    // Back button
                     GestureDetector(
                       onTap: () => context.pop(),
                       child: Icon(
@@ -85,7 +84,6 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                     ),
                     SizedBox(height: 40.h),
 
-                    // Title
                     Center(
                       child: Text(
                         'Forget Password',
@@ -106,7 +104,6 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                     ),
                     SizedBox(height: 60.h),
 
-                    // Form
                     Form(
                       key: _formKey,
                       child: Column(
@@ -124,7 +121,6 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                           ),
                           SizedBox(height: 30.h),
 
-                          // Verify button
                           SizedBox(
                             width: double.infinity,
                             height: 50.h,

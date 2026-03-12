@@ -64,7 +64,6 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         throw AuthException('Failed to create user');
       }
 
-      // Update user profile with display name and photo URL
       await user.updateDisplayName(name);
       await user.updatePhotoURL(photoUrl);
       await user.reload();
@@ -231,24 +230,19 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
 
       final googleSignIn = GoogleSignIn.instance;
 
-      // Sign in with Google
       final googleUser = await googleSignIn.authenticate(
         scopeHint: ['email', 'profile'],
       );
 
-      // Get authentication details (idToken)
       final googleAuth = googleUser.authentication;
 
-      // Get authorization details (accessToken)
       final googleAuthz = await googleUser.authorizationClient.authorizeScopes(['email', 'profile']);
 
-      // Create credential for Firebase
       final credential = GoogleAuthProvider.credential(
         accessToken: googleAuthz.accessToken,
         idToken: googleAuth.idToken,
       );
 
-      // Sign in to Firebase with the Google credential
       final userCredential = await _firebaseAuth.signInWithCredential(credential);
 
       final user = userCredential.user;
