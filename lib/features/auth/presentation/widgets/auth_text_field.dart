@@ -77,7 +77,7 @@ class _AuthTextFieldState extends State<AuthTextField> {
                     ? Icons.visibility_off_rounded
                     : Icons.visibility_rounded,
                 color: AppColors.textTertiary,
-                size: 20.sp,
+                size: 30.sp,
               ),
               onPressed: () {
                 setState(() {
