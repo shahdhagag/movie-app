@@ -1,14 +1,4 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get_it/get_it.dart';
-import '../../features/auth/data/datasources/auth_remote_data_source.dart';
-import '../../features/auth/data/repositories/auth_repository_impl.dart';
-import '../../features/auth/domain/repositories/auth_repository.dart';
-import '../../features/auth/domain/usecases/forgot_password_usecase.dart';
-import '../../features/auth/domain/usecases/google_sign_in_usecase.dart';
-import '../../features/auth/domain/usecases/login_usecase.dart';
-import '../../features/auth/domain/usecases/logout_usecase.dart';
-import '../../features/auth/domain/usecases/register_usecase.dart';
-import '../../features/auth/presentation/bloc/auth_bloc.dart';
 import '../../features/home/data/dataSource/movie_remote_data_source.dart';
 import '../../features/home/data/repositories/movie_repository_impl.dart';
 import '../../features/home/domain/repositories/movie_repository.dart';
@@ -34,49 +24,6 @@ Future<void> setupLocator() async {
   // Core - Dio Client
   getIt.registerLazySingleton<DioClient>(() => DioClient());
   getIt.registerLazySingleton(() => getIt<DioClient>().dio);
-
-  // ==================== AUTH FEATURE ====================
-
-  // Firebase Auth instance
-  getIt.registerLazySingleton<FirebaseAuth>(() => FirebaseAuth.instance);
-
-  // Data Sources
-  getIt.registerLazySingleton<AuthRemoteDataSource>(
-    () => AuthRemoteDataSourceImpl(firebaseAuth: getIt<FirebaseAuth>()),
-  );
-
-  // Repositories
-  getIt.registerLazySingleton<AuthRepository>(
-    () => AuthRepositoryImpl(remoteDataSource: getIt<AuthRemoteDataSource>()),
-  );
-
-  // Use Cases
-  getIt.registerLazySingleton<LoginUseCase>(
-    () => LoginUseCase(getIt<AuthRepository>()),
-  );
-  getIt.registerLazySingleton<RegisterUseCase>(
-    () => RegisterUseCase(getIt<AuthRepository>()),
-  );
-  getIt.registerLazySingleton<LogoutUseCase>(
-    () => LogoutUseCase(getIt<AuthRepository>()),
-  );
-  getIt.registerLazySingleton<ForgotPasswordUseCase>(
-    () => ForgotPasswordUseCase(getIt<AuthRepository>()),
-  );
-  getIt.registerLazySingleton<GoogleSignInUseCase>(
-    () => GoogleSignInUseCase(getIt<AuthRepository>()),
-  );
-
-  // BLoCs
-  getIt.registerFactory<AuthBloc>(
-    () => AuthBloc(
-      loginUseCase: getIt<LoginUseCase>(),
-      registerUseCase: getIt<RegisterUseCase>(),
-      logoutUseCase: getIt<LogoutUseCase>(),
-      forgotPasswordUseCase: getIt<ForgotPasswordUseCase>(),
-      googleSignInUseCase: getIt<GoogleSignInUseCase>(),
-    ),
-  );
 
   // ==================== HOME FEATURE ====================
 

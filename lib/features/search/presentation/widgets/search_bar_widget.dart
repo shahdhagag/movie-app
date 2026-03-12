@@ -29,6 +29,7 @@ class SearchBarWidget extends StatelessWidget {
             context.read<SearchCubit>().searchMovies(value);
           },
           style: const TextStyle(color: Colors.white),
+          cursorColor: Colors.white,
           decoration: InputDecoration(
             border: InputBorder.none,
             hintText: "Search",
