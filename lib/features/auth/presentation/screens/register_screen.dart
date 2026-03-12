@@ -1,3 +1,4 @@
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -13,7 +14,7 @@ import '../../presentation/bloc/auth_state.dart';
 import '../widgets/auth_text_field.dart';
 
 class RegisterScreen extends StatefulWidget {
-  const RegisterScreen({Key? key}) : super(key: key);
+  const RegisterScreen({super.key});
 
   @override
   State<RegisterScreen> createState() => _RegisterScreenState();
@@ -26,6 +27,21 @@ class _RegisterScreenState extends State<RegisterScreen> {
   late TextEditingController _passwordController;
   late TextEditingController _confirmPasswordController;
   final _formKey = GlobalKey<FormState>();
+
+  // Avatar list
+  final List<String> _avatarList = [
+    AppAssets.avatar1,
+    AppAssets.avatar2,
+    AppAssets.avatar3,
+    AppAssets.avatar4,
+    AppAssets.avatar5,
+    AppAssets.avatar6,
+    AppAssets.avatar7,
+    AppAssets.avatar8,
+    AppAssets.avatar9,
+  ];
+
+  int _selectedAvatarIndex = 0;
 
   @override
   void initState() {
@@ -54,7 +70,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
               email: _emailController.text.trim(),
               password: _passwordController.text,
               name: _nameController.text.trim(),
-              phoneNumber: _phoneController.text.trim(), photoUrl: '',
+              phoneNumber: _phoneController.text.trim(),
+              photoUrl: _avatarList[_selectedAvatarIndex],
             ),
           );
     }
@@ -114,6 +131,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       key: _formKey,
                       child: Column(
                         children: [
+                          // Avatar Selection with CarouselSlider
                           Center(
                             child: Column(
                               children: [
@@ -121,19 +139,53 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                   'Avatar',
                                   style: AppStyles.h5.copyWith(fontSize: 14.sp),
                                 ),
-                                SizedBox(height: 12.h),
-                                Container(
-                                  width: 60.w,
-                                  height: 60.w,
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    color: AppColors.grey,
+                                SizedBox(height: 16.h),
+                                CarouselSlider(
+                                  options: CarouselOptions(
+                                    height: 140.h,
+                                    viewportFraction: 0.35,
+                                    enlargeCenterPage: true,
+                                    enableInfiniteScroll: true,
+                                    scrollDirection: Axis.horizontal,
+                                    onPageChanged: (index, reason) {
+                                      setState(() {
+                                        _selectedAvatarIndex = index;
+                                      });
+                                    },
                                   ),
-                                  child: Icon(
-                                    Icons.person,
-                                    color: AppColors.textTertiary,
-                                    size: 30.sp,
-                                  ),
+                                  items: _avatarList.asMap().entries.map((entry) {
+                                    int index = entry.key;
+                                    String avatar = entry.value;
+                                    bool isSelected = index == _selectedAvatarIndex;
+
+                                    return Container(
+                                      margin: EdgeInsets.symmetric(horizontal: 8.w),
+                                      decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        border: isSelected
+                                            ? Border.all(
+                                                color: AppColors.primary,
+                                                width: 3.w,
+                                              )
+                                            : null,
+                                      ),
+                                      child: GestureDetector(
+                                        onTap: () {
+                                          setState(() {
+                                            _selectedAvatarIndex = index;
+                                          });
+                                        },
+                                        child: ClipRRect(
+                                          borderRadius:
+                                              BorderRadius.circular(100.r),
+                                          child: Image.asset(
+                                            avatar,
+                                            fit: BoxFit.cover,
+                                          ),
+                                        ),
+                                      ),
+                                    );
+                                  }).toList(),
                                 ),
                                 SizedBox(height: 20.h),
                               ],
