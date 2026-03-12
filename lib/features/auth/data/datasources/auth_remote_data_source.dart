@@ -9,6 +9,7 @@ abstract class AuthRemoteDataSource {
     required String password,
     required String name,
     required String phoneNumber,
+    required String photoUrl,
   });
 
   Future<AuthUserModel> login({
@@ -34,9 +35,15 @@ abstract class AuthRemoteDataSource {
 
 class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   final FirebaseAuth _firebaseAuth;
+  Future<void>? _googleSignInInitFuture;
 
   AuthRemoteDataSourceImpl({required FirebaseAuth firebaseAuth})
       : _firebaseAuth = firebaseAuth;
+
+  Future<void> _ensureGoogleSignInInitialized() async {
+    _googleSignInInitFuture ??= GoogleSignIn.instance.initialize();
+    await _googleSignInInitFuture;
+  }
 
   @override
   Future<AuthUserModel> register({
@@ -44,6 +51,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     required String password,
     required String name,
     required String phoneNumber,
+    required String photoUrl,
   }) async {
     try {
       final userCredential = await _firebaseAuth.createUserWithEmailAndPassword(
@@ -56,17 +64,20 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         throw AuthException('Failed to create user');
       }
 
-      // Update user profile with display name
+      // Update user profile with display name and photo URL
       await user.updateDisplayName(name);
+      await user.updatePhotoURL(photoUrl);
       await user.reload();
 
+      final updatedUser = _firebaseAuth.currentUser;
+
       return AuthUserModel(
-        uid: user.uid,
-        email: user.email ?? '',
-        displayName: name,
+        uid: updatedUser!.uid,
+        email: updatedUser.email ?? '',
+        displayName: updatedUser.displayName ?? name,
         phoneNumber: phoneNumber,
-        isEmailVerified: user.emailVerified,
-        photoUrl: user.photoURL,
+        isEmailVerified: updatedUser.emailVerified,
+        photoUrl: updatedUser.photoURL ?? photoUrl,
       );
     } on FirebaseAuthException catch (e) {
       throw _handleFirebaseAuthException(e);
@@ -216,27 +227,24 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   @override
   Future<AuthUserModel> signInWithGoogle() async {
     try {
-      final GoogleSignIn googleSignIn = GoogleSignIn();
+      await _ensureGoogleSignInInitialized();
 
-      // Check if user is already signed in and sign out
-      final isSignedIn = await googleSignIn.isSignedIn();
-      if (isSignedIn) {
-        await googleSignIn.signOut();
-      }
+      final googleSignIn = GoogleSignIn.instance;
 
       // Sign in with Google
-      final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
+      final googleUser = await googleSignIn.authenticate(
+        scopeHint: ['email', 'profile'],
+      );
 
-      if (googleUser == null) {
-        throw AuthException('Google sign in was cancelled');
-      }
+      // Get authentication details (idToken)
+      final googleAuth = googleUser.authentication;
 
-      // Get authentication details
-      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+      // Get authorization details (accessToken)
+      final googleAuthz = await googleUser.authorizationClient.authorizeScopes(['email', 'profile']);
 
       // Create credential for Firebase
       final credential = GoogleAuthProvider.credential(
-        accessToken: googleAuth.accessToken,
+        accessToken: googleAuthz.accessToken,
         idToken: googleAuth.idToken,
       );
 
@@ -258,6 +266,11 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       );
     } on AuthException {
       rethrow;
+    } on GoogleSignInException catch (e) {
+      if (e.code == GoogleSignInExceptionCode.canceled) {
+        throw AuthException('Google sign in was cancelled');
+      }
+      throw AuthException('Google sign in failed: ${e.description ?? e.code}');
     } on FirebaseAuthException catch (e) {
       throw _handleFirebaseAuthException(e);
     } catch (e) {
@@ -265,4 +278,3 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     }
   }
 }
-

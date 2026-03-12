@@ -25,16 +25,18 @@ class RegisterEvent extends AuthEvent {
   final String password;
   final String name;
   final String phoneNumber;
+  final String photoUrl;
 
   const RegisterEvent({
     required this.email,
     required this.password,
     required this.name,
     required this.phoneNumber,
+    required this.photoUrl,
   });
 
   @override
-  List<Object?> get props => [email, password, name, phoneNumber];
+  List<Object?> get props => [email, password, name, phoneNumber, photoUrl];
 }
 
 class LogoutEvent extends AuthEvent {
@@ -61,4 +63,3 @@ class ClearAuthStateEvent extends AuthEvent {
 class GoogleSignInEvent extends AuthEvent {
   const GoogleSignInEvent();
 }
-

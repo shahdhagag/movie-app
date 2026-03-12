@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:movie/core/utils/app_assets.dart';
 import '../../../../core/utils/app_colors.dart';
 import '../../../../core/utils/app_styles.dart';
 import '../../../../core/utils/app_validators.dart';
@@ -53,7 +54,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               email: _emailController.text.trim(),
               password: _passwordController.text,
               name: _nameController.text.trim(),
-              phoneNumber: _phoneController.text.trim(),
+              phoneNumber: _phoneController.text.trim(), photoUrl: '',
             ),
           );
     }
@@ -140,49 +141,44 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           ),
 
                           AuthTextField(
-                            label: 'Name',
-                            hintText: 'Enter your full name',
+                            hintText: 'Name',
                             controller: _nameController,
-                            // prefixIcon: Icons.person_outline_rounded,
+                             prefixIcon: Image.asset(AppAssets.nameIcon,width: 3.w,height: 25.h),
                             validator: AppValidators.validateName,
                           ),
                           SizedBox(height: 20.h),
 
                           AuthTextField(
-                            label: 'Email',
-                            hintText: 'Enter your email',
+                            hintText: 'Email',
                             controller: _emailController,
-                            // prefixIcon: Icons.mail_outline_rounded,
+                            prefixIcon: Image.asset(AppAssets.emailIcon,width: 3.w,height: 25.h,),
                             keyboardType: TextInputType.emailAddress,
                             validator: AppValidators.validateEmail,
                           ),
                           SizedBox(height: 20.h),
 
                           AuthTextField(
-                            label: 'Phone Number',
-                            hintText: 'Enter your phone number',
+                            hintText: ' Phone number',
                             controller: _phoneController,
-                            // prefixIcon: Icons.phone_outlined,
+                            prefixIcon: Image.asset(AppAssets.phoneIcon,width: 3.w,height: 25.h,),
                             keyboardType: TextInputType.phone,
                             validator: AppValidators.validatePhone,
                           ),
                           SizedBox(height: 20.h),
 
                           AuthTextField(
-                            label: 'Password',
-                            hintText: 'Enter your password',
+                            hintText: ' Password',
                             controller: _passwordController,
-                            // prefixIcon: Icons.lock_outline_rounded,
+                           prefixIcon: Image.asset(AppAssets.passwordIcon,width: 3.w,height: 25.h),
                             isPassword: true,
                             validator: AppValidators.validatePassword,
                           ),
                           SizedBox(height: 20.h),
 
                           AuthTextField(
-                            label: 'Confirm Password',
-                            hintText: 'Confirm your password',
+                            hintText: 'Confirm Password',
                             controller: _confirmPasswordController,
-                            // prefixIcon: Icons.lock_outline_rounded,
+                           prefixIcon: Image.asset(AppAssets.passwordIcon,width: 3.w,height: 25.h),
                             isPassword: true,
                             validator: (value) => AppValidators.validateConfirmPassword(
                               value,

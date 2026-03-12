@@ -15,3 +15,6 @@ class GoogleSignInUseCase implements UseCase<AuthUser, NoParams> {
   }
 }
 
+class NoParams {}
+
+

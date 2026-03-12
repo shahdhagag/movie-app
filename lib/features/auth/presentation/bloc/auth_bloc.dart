@@ -1,8 +1,9 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../../core/usecases/usecase.dart';
 import '../../domain/usecases/forgot_password_usecase.dart';
-import '../../domain/usecases/google_sign_in_usecase.dart';
+import '../../domain/usecases/google_sign_in_usecase.dart' as google_sign_in;
 import '../../domain/usecases/login_usecase.dart';
-import '../../domain/usecases/logout_usecase.dart';
+import '../../domain/usecases/logout_usecase.dart' as logout;
 import '../../domain/usecases/register_usecase.dart';
 import 'auth_event.dart';
 import 'auth_state.dart';
@@ -10,9 +11,9 @@ import 'auth_state.dart';
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final LoginUseCase loginUseCase;
   final RegisterUseCase registerUseCase;
-  final LogoutUseCase logoutUseCase;
+  final logout.LogoutUseCase logoutUseCase;
   final ForgotPasswordUseCase forgotPasswordUseCase;
-  final GoogleSignInUseCase googleSignInUseCase;
+  final google_sign_in.GoogleSignInUseCase googleSignInUseCase;
 
   AuthBloc({
     required this.loginUseCase,
@@ -55,6 +56,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         password: event.password,
         name: event.name,
         phoneNumber: event.phoneNumber,
+        photoUrl: event.photoUrl,
       ),
     );
 
@@ -67,7 +69,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   Future<void> _onLogout(LogoutEvent event, Emitter<AuthState> emit) async {
     emit(const AuthLoading());
 
-    final result = await logoutUseCase(NoParams());
+    final result = await logoutUseCase(logout.NoParams());
 
     result.fold(
       (failure) => emit(AuthError(failure.message)),
@@ -93,6 +95,20 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     );
   }
 
+  Future<void> _onGoogleSignIn(
+    GoogleSignInEvent event,
+    Emitter<AuthState> emit,
+  ) async {
+    emit(const AuthLoading());
+
+    final result = await googleSignInUseCase(google_sign_in.NoParams());
+
+    result.fold(
+      (failure) => emit(AuthError(failure.message)),
+      (user) => emit(AuthSuccess(user: user, message: 'Google Login successful')),
+    );
+  }
+
   Future<void> _onCheckAuthStatus(
     CheckAuthStatusEvent event,
     Emitter<AuthState> emit,
@@ -106,19 +122,4 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   ) async {
     emit(const AuthInitial());
   }
-
-  Future<void> _onGoogleSignIn(
-    GoogleSignInEvent event,
-    Emitter<AuthState> emit,
-  ) async {
-    emit(const AuthLoading());
-
-    final result = await googleSignInUseCase(NoParams());
-
-    result.fold(
-      (failure) => emit(AuthError(failure.message)),
-      (user) => emit(AuthSuccess(user: user, message: 'Google Sign-In successful')),
-    );
-  }
 }
-

@@ -1,5 +1,4 @@
 import 'package:flutter/gestures.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -59,7 +58,6 @@ class _LoginScreenState extends State<LoginScreen> {
             ScaffoldMessenger.of(
               context,
             ).showSnackBar(SnackBar(content: Text(state.message)));
-            // Navigate to home screen
             context.go('/main');
           } else if (state is AuthError) {
             ScaffoldMessenger.of(context).showSnackBar(
@@ -79,7 +77,6 @@ class _LoginScreenState extends State<LoginScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     SizedBox(height: 60.h),
-                    // Back button
                     GestureDetector(
                       onTap: () => context.pop(),
                       child: Icon(
@@ -90,7 +87,6 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     SizedBox(height: 40.h),
 
-                    // Play icon
                     Center(
                       child: Center(
                         child: Image.asset(
@@ -100,17 +96,13 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                       ),
                     ),
-                    SizedBox(height: 40.h),
+                    SizedBox(height: 80.h),
 
-                    Center(child: Text('Login', style: AppStyles.h2)),
-                    SizedBox(height: 40.h),
 
-                    // Form
                     Form(
                       key: _formKey,
                       child: Column(
                         children: [
-                          // Email field
                           AuthTextField(
                             hintText: ' Email',
                             controller: _emailController,
@@ -120,7 +112,6 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                           SizedBox(height: 20.h),
 
-                          // Password field
                           AuthTextField(
 
                             hintText: ' Password',
@@ -131,7 +122,6 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                           SizedBox(height: 12.h),
 
-                          // Forgot password
                           Align(
                             alignment: Alignment.centerRight,
                             child: GestureDetector(
@@ -147,7 +137,6 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                           SizedBox(height: 30.h),
 
-                          // Login button
                           SizedBox(
                             width: double.infinity,
                             height: 50.h,
@@ -178,7 +167,6 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                           SizedBox(height: 20.h),
 
-                          // Register link
                           Center(
                             child: RichText(
                               text: TextSpan(
@@ -206,7 +194,6 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                           SizedBox(height: 30.h),
 
-                          // OR Divider
                           Row(
                             children: [
                               Expanded(
@@ -235,7 +222,6 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                           SizedBox(height: 30.h),
 
-                          // Google Sign-In Button
                           SizedBox(
                             width: double.infinity,
                             height: 50.h,
