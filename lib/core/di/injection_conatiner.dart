@@ -1,7 +1,14 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get_it/get_it.dart';
-import '../../features/browse/data/datasources/browse_remote_data_source.dart';
-import '../../features/browse/data/repositories/browse_repository_impl.dart';
-import '../../features/browse/domain/repositories/browse_repository.dart';
+import '../../features/auth/data/datasources/auth_remote_data_source.dart';
+import '../../features/auth/data/repositories/auth_repository_impl.dart';
+import '../../features/auth/domain/repositories/auth_repository.dart';
+import '../../features/auth/domain/usecases/forgot_password_usecase.dart';
+import '../../features/auth/domain/usecases/google_sign_in_usecase.dart';
+import '../../features/auth/domain/usecases/login_usecase.dart';
+import '../../features/auth/domain/usecases/logout_usecase.dart';
+import '../../features/auth/domain/usecases/register_usecase.dart';
+import '../../features/auth/presentation/bloc/auth_bloc.dart';
 import '../../features/browse/presentation/cubit/browse_cubit.dart';
 import '../../features/home/data/dataSource/movie_remote_data_source.dart';
 import '../../features/home/data/repositories/movie_repository_impl.dart';
@@ -29,6 +36,49 @@ Future<void> setupLocator() async {
   getIt.registerLazySingleton<DioClient>(() => DioClient());
   getIt.registerLazySingleton(() => getIt<DioClient>().dio);
 
+  // ==================== AUTH FEATURE ====================
+
+  // Firebase Auth instance
+  getIt.registerLazySingleton<FirebaseAuth>(() => FirebaseAuth.instance);
+
+  // Data Sources
+  getIt.registerLazySingleton<AuthRemoteDataSource>(
+    () => AuthRemoteDataSourceImpl(firebaseAuth: getIt<FirebaseAuth>()),
+  );
+
+  // Repositories
+  getIt.registerLazySingleton<AuthRepository>(
+    () => AuthRepositoryImpl(remoteDataSource: getIt<AuthRemoteDataSource>()),
+  );
+
+  // Use Cases
+  getIt.registerLazySingleton<LoginUseCase>(
+    () => LoginUseCase(getIt<AuthRepository>()),
+  );
+  getIt.registerLazySingleton<RegisterUseCase>(
+    () => RegisterUseCase(getIt<AuthRepository>()),
+  );
+  getIt.registerLazySingleton<LogoutUseCase>(
+    () => LogoutUseCase(getIt<AuthRepository>()),
+  );
+  getIt.registerLazySingleton<ForgotPasswordUseCase>(
+    () => ForgotPasswordUseCase(getIt<AuthRepository>()),
+  );
+  getIt.registerLazySingleton<GoogleSignInUseCase>(
+    () => GoogleSignInUseCase(getIt<AuthRepository>()),
+  );
+
+  // BLoCs
+  getIt.registerFactory<AuthBloc>(
+    () => AuthBloc(
+      loginUseCase: getIt<LoginUseCase>(),
+      registerUseCase: getIt<RegisterUseCase>(),
+      logoutUseCase: getIt<LogoutUseCase>(),
+      forgotPasswordUseCase: getIt<ForgotPasswordUseCase>(),
+      googleSignInUseCase: getIt<GoogleSignInUseCase>(),
+    ),
+  );
+
   // ==================== HOME FEATURE ====================
 
   // Data Sources
@@ -55,6 +105,13 @@ Future<void> setupLocator() async {
       getMovies: getIt<GetMovies>(),
       getMoviesByGenre: getIt<GetMoviesByGenre>(),
     ),
+  );
+
+  // ==================== BROWSE FEATURE ====================
+
+  // Cubits
+  getIt.registerFactory<BrowseCubit>(
+    () => BrowseCubit(getIt<GetMoviesByGenre>()),
   );
 
   // ==================== MOVIE DETAILS FEATURE ====================
@@ -113,31 +170,4 @@ Future<void> setupLocator() async {
       searchMoviesUseCase: getIt<SearchMoviesUseCase>(),
     ),
   );
-
-// ==================== BROWSE FEATURE ====================
-
-
-
-  // Data Sources
-  getIt.registerLazySingleton<BrowseRemoteDataSource>(
-        () => BrowseRemoteDataSourceImpl(getIt()),
-  );
-
-// Repositories
-  getIt.registerLazySingleton<BrowseRepository>(
-        () => BrowseRepositoryImpl(
-      getIt<BrowseRemoteDataSource>(),
-    ),
-  );
-
-// // UseCases
-//   getIt.registerLazySingleton<GetMoviesByGenre>(
-//         () => GetMoviesByGenre(getIt<MovieRepository>()),
-//   );
-
-// Cubit
-  getIt.registerFactory<BrowseCubit>(
-        () => BrowseCubit(getIt<GetMoviesByGenre>()),
-  );
 }
-

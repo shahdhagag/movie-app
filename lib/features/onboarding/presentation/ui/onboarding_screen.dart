@@ -58,6 +58,8 @@ class OnboardingScreen extends StatelessWidget {
         builder: (context, state) {
           return Scaffold(
             body: PageView.builder(
+
+
               controller: controller,
               physics: const NeverScrollableScrollPhysics(),
               itemCount: pages.length,
@@ -84,7 +86,7 @@ class OnboardingScreen extends StatelessWidget {
                   isLast: state.isLast(pages.length),
                   onNext: () {
                     if (state.isLast(pages.length)) {
-                      context.go('/main');
+                      context.go('/register');
                     } else {
                       controller.nextPage(
                         duration: const Duration(milliseconds: 300),
