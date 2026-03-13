@@ -15,3 +15,5 @@ class GetHistoryUseCase extends UseCase<List<MovieItem>, NoParams> {
   }
 }
 
+
+

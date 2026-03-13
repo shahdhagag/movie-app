@@ -4,6 +4,7 @@ import '../../domain/usecases/get_watchlist.dart';
 import '../../domain/usecases/get_history.dart';
 import '../../domain/usecases/logout.dart';
 import '../../domain/usecases/delete_account.dart';
+import '../../../../core/usecases/usecase.dart';
 import '../bloc/profile_event.dart';
 import '../bloc/profile_state.dart';
 
@@ -39,7 +40,7 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
     final watchListResult = await getWatchListUseCase(NoParams());
     final historyResult = await getHistoryUseCase(NoParams());
 
-    await profileResult.fold(
+    profileResult.fold(
       (failure) => emit(ProfileError(message: failure.message)),
       (profile) {
         watchListResult.fold(
@@ -119,6 +120,8 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
     );
   }
 }
+
+
 
 
 

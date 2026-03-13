@@ -7,7 +7,6 @@ import '../../../../config/routes/app_routes.dart';
 import '../../../../core/di/injection_conatiner.dart';
 import '../../../../core/utils/app_colors.dart';
 import '../../../../core/utils/app_styles.dart';
-import '../../../../core/utils/app_assets.dart';
 import '../bloc/profile_bloc.dart';
 import '../bloc/profile_event.dart';
 import '../bloc/profile_state.dart';
@@ -38,33 +37,51 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget build(BuildContext context) {
     return BlocProvider<ProfileBloc>.value(
       value: _profileBloc,
-      child: BlocBuilder<ProfileBloc, ProfileState>(
-        builder: (context, state) {
-          if (state is ProfileLoading) {
-            return Center(
-              child: CircularProgressIndicator(color: AppColors.primary),
-            );
-          }
-
-          if (state is ProfileError) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.error_outline, color: AppColors.red, size: 60.sp),
-                  Gap(16.h),
-                  Text(
-                    state.message,
-                    style: TextStyle(
-                      color: AppColors.textPrimary,
-                      fontSize: 14.sp,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ],
+      child: BlocListener<ProfileBloc, ProfileState>(
+        listener: (context, state) {
+          if (state is LogoutSuccess) {
+            // Navigate to login screen on successful logout
+            context.go(AppRoutes.login);
+          } else if (state is DeleteAccountSuccess) {
+            // Navigate to login screen after successful account deletion
+            context.go(AppRoutes.login);
+          } else if (state is ProfileError) {
+            // Show error snackbar
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(state.message),
+                backgroundColor: AppColors.red,
               ),
             );
           }
+        },
+        child: BlocBuilder<ProfileBloc, ProfileState>(
+          builder: (context, state) {
+            if (state is ProfileLoading) {
+              return Center(
+                child: CircularProgressIndicator(color: AppColors.primary),
+              );
+            }
+
+            if (state is ProfileError) {
+              return Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.error_outline, color: AppColors.red, size: 60.sp),
+                    Gap(16.h),
+                    Text(
+                      state.message,
+                      style: TextStyle(
+                        color: AppColors.textPrimary,
+                        fontSize: 14.sp,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                ),
+              );
+            }
 
           if (state is ProfileLoaded) {
             return SingleChildScrollView(
@@ -181,7 +198,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
               message: 'No profile data available',
             ),
           );
-        },
+          },
+        ),
       ),
     );
   }
@@ -198,7 +216,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
       movies: state.watchList,
       onMovieTap: (movie) {
         context.push(
-          '${AppRoutes.movieDetails}/${movie.movieId}',
+          AppRoutes.movieDetails,
+          extra: movie.movieId,
         );
       },
     );
@@ -216,7 +235,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
       movies: state.history,
       onMovieTap: (movie) {
         context.push(
-          '${AppRoutes.movieDetails}/${movie.movieId}',
+          AppRoutes.movieDetails,
+          extra: movie.movieId,
         );
       },
     );

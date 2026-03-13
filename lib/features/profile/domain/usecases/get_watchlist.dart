@@ -15,3 +15,5 @@ class GetWatchListUseCase extends UseCase<List<MovieItem>, NoParams> {
   }
 }
 
+
+
