@@ -6,7 +6,7 @@ import '../../features/auth/domain/repositories/auth_repository.dart';
 import '../../features/auth/domain/usecases/forgot_password_usecase.dart';
 import '../../features/auth/domain/usecases/google_sign_in_usecase.dart';
 import '../../features/auth/domain/usecases/login_usecase.dart';
-import '../../features/auth/domain/usecases/logout_usecase.dart';
+import '../../features/auth/domain/usecases/logout_usecase.dart' as auth_logout;
 import '../../features/auth/domain/usecases/register_usecase.dart';
 import '../../features/auth/presentation/bloc/auth_bloc.dart';
 import '../../features/browse/presentation/cubit/browse_cubit.dart';
@@ -27,6 +27,16 @@ import '../../features/search/data/reposatories/search_repository_impl.dart';
 import '../../features/search/domain/repositories/search_repo.dart';
 import '../../features/search/domain/usecases/search_movies_usecase.dart';
 import '../../features/search/presentation/cubit/search_cubit.dart';
+import '../../features/profile/data/datasources/profile_remote_data_source.dart';
+import '../../features/profile/data/repositories/profile_repository_impl.dart';
+import '../../features/profile/domain/repositories/profile_repository.dart';
+import '../../features/profile/domain/usecases/get_user_profile.dart';
+import '../../features/profile/domain/usecases/get_watchlist.dart';
+import '../../features/profile/domain/usecases/get_history.dart';
+import '../../features/profile/domain/usecases/logout.dart';
+import '../../features/profile/domain/usecases/delete_account.dart';
+import '../../features/profile/presentation/bloc/profile_bloc.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import '../api/dio_client.dart';
 
 final getIt = GetIt.instance;
@@ -58,8 +68,8 @@ Future<void> setupLocator() async {
   getIt.registerLazySingleton<RegisterUseCase>(
     () => RegisterUseCase(getIt<AuthRepository>()),
   );
-  getIt.registerLazySingleton<LogoutUseCase>(
-    () => LogoutUseCase(getIt<AuthRepository>()),
+  getIt.registerLazySingleton<auth_logout.LogoutUseCase>(
+    () => auth_logout.LogoutUseCase(getIt<AuthRepository>()),
   );
   getIt.registerLazySingleton<ForgotPasswordUseCase>(
     () => ForgotPasswordUseCase(getIt<AuthRepository>()),
@@ -73,7 +83,7 @@ Future<void> setupLocator() async {
     () => AuthBloc(
       loginUseCase: getIt<LoginUseCase>(),
       registerUseCase: getIt<RegisterUseCase>(),
-      logoutUseCase: getIt<LogoutUseCase>(),
+      logoutUseCase: getIt<auth_logout.LogoutUseCase>(),
       forgotPasswordUseCase: getIt<ForgotPasswordUseCase>(),
       googleSignInUseCase: getIt<GoogleSignInUseCase>(),
     ),
@@ -168,6 +178,52 @@ Future<void> setupLocator() async {
   getIt.registerFactory<SearchCubit>(
         () => SearchCubit(
       searchMoviesUseCase: getIt<SearchMoviesUseCase>(),
+    ),
+  );
+
+  // ==================== PROFILE FEATURE ====================
+
+  // Firebase Firestore instance
+  getIt.registerLazySingleton<FirebaseFirestore>(() => FirebaseFirestore.instance);
+
+  // Data Sources
+  getIt.registerLazySingleton<ProfileRemoteDataSource>(
+    () => ProfileRemoteDataSourceImpl(
+      firestore: getIt<FirebaseFirestore>(),
+      firebaseAuth: getIt<FirebaseAuth>(),
+    ),
+  );
+
+  // Repositories
+  getIt.registerLazySingleton<ProfileRepository>(
+    () => ProfileRepositoryImpl(remoteDataSource: getIt<ProfileRemoteDataSource>()),
+  );
+
+  // Use Cases
+  getIt.registerLazySingleton<GetUserProfileUseCase>(
+    () => GetUserProfileUseCase(getIt<ProfileRepository>()),
+  );
+  getIt.registerLazySingleton<GetWatchListUseCase>(
+    () => GetWatchListUseCase(getIt<ProfileRepository>()),
+  );
+  getIt.registerLazySingleton<GetHistoryUseCase>(
+    () => GetHistoryUseCase(getIt<ProfileRepository>()),
+  );
+  getIt.registerLazySingleton<LogoutUseCase>(
+    () => LogoutUseCase(getIt<ProfileRepository>()),
+  );
+  getIt.registerLazySingleton<DeleteAccountUseCase>(
+    () => DeleteAccountUseCase(getIt<ProfileRepository>()),
+  );
+
+  // BLoCs
+  getIt.registerFactory<ProfileBloc>(
+    () => ProfileBloc(
+      getUserProfileUseCase: getIt<GetUserProfileUseCase>(),
+      getWatchListUseCase: getIt<GetWatchListUseCase>(),
+      getHistoryUseCase: getIt<GetHistoryUseCase>(),
+      logoutUseCase: getIt<LogoutUseCase>(),
+      deleteAccountUseCase: getIt<DeleteAccountUseCase>(),
     ),
   );
 }
