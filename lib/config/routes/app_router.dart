@@ -13,6 +13,8 @@ import '../../features/home/domain/entities/movie.dart';
 import '../../features/home/presentation/screens/genre_movies_screen.dart';
 import '../../features/home/presentation/screens/main_screen.dart';
 import '../../features/movie_details/presentation/screens/movie_details_screen.dart';
+import '../../features/profile/presentation/bloc/profile_bloc.dart';
+import '../../features/profile/presentation/screens/edit_profile_screen.dart';
 import '../../features/profile/presentation/screens/profile_screen.dart';
 import '../../features/search/presentation/screen/search_screen.dart';
 import '../../features/splash/splash_screen.dart';
@@ -155,7 +157,10 @@ class AppRouter {
       GoRoute(
         path: AppRoutes.editProfile,
         name: 'editProfile',
-        builder: (context, state) => const Placeholder(),
+        builder: (context, state) => BlocProvider<ProfileBloc>.value(
+          value: getIt<ProfileBloc>(),
+          child: const EditProfileScreen(),
+        ),
       ),
       GoRoute(
         path: AppRoutes.updateProfile,
