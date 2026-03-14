@@ -19,41 +19,38 @@ class TabIndicator extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Column(
-        children: [
-          // Icon
-          Icon(
-            icon,
-            color: isSelected ? AppColors.primary : AppColors.textTertiary,
-            size: 24.sp,
-          ),
-          SizedBox(height: 8.h),
-          // Label
-          Text(
-            label,
-            style: AppStyles.h5.copyWith(
-              fontSize: 14.sp,
-              color: isSelected ? AppColors.textPrimary : AppColors.textTertiary,
-              fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+    return Expanded(
+      child: GestureDetector(
+        onTap: onTap,
+        behavior: HitTestBehavior.opaque,
+        child: Column(
+          children: [
+            // Icon
+            Icon(
+              icon,
+              color: isSelected ? AppColors.primary : AppColors.textPrimary,
+              size: 28.sp,
             ),
-          ),
-          SizedBox(height: 8.h),
-          // Underline indicator
-          if (isSelected)
-            Container(
-              width: 60.w,
-              height: 3.h,
-              decoration: BoxDecoration(
-                color: AppColors.primary,
-                borderRadius: BorderRadius.circular(2.r),
+            SizedBox(height: 8.h),
+            // Label
+            Text(
+              label,
+              style: AppStyles.h5.copyWith(
+                fontSize: 16.sp,
+                color: isSelected ? AppColors.textPrimary : AppColors.textPrimary,
+                fontWeight: FontWeight.bold,
               ),
             ),
-        ],
+            SizedBox(height: 12.h),
+            // Underline indicator
+            Container(
+              width: double.infinity,
+              height: 2.h,
+              color: isSelected ? AppColors.primary : Colors.transparent,
+            ),
+          ],
+        ),
       ),
     );
   }
 }
-
-

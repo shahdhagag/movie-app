@@ -1,22 +1,16 @@
 import 'package:dartz/dartz.dart';
 import '../../../../core/errors/failures.dart';
-import '../../../../core/usecases/usecase.dart';
 import '../repositories/profile_repository.dart';
 
-class IsMovieInHistoryUseCase extends UseCase<Future<Either<Failure, bool>>, IsMovieInHistoryParams> {
+class IsMovieInHistoryUseCase {
   final ProfileRepository repository;
 
   IsMovieInHistoryUseCase(this.repository);
 
-  @override
-  Future<Either<Failure, bool>> call(IsMovieInHistoryParams params) async {
-    return await repository.isMovieInHistory(movieId: params.movieId);
+  Future<Either<Failure, bool>> call({required int movieId}) async {
+    return await repository.isMovieInHistory(movieId: movieId);
   }
 }
 
-class IsMovieInHistoryParams {
-  final int movieId;
 
-  IsMovieInHistoryParams({required this.movieId});
-}
 

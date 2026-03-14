@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
+
 import '../../../../config/routes/app_routes.dart';
 import '../../../../core/di/injection_conatiner.dart';
 import '../../../../core/utils/app_colors.dart';
@@ -10,11 +11,10 @@ import '../../../../core/utils/app_styles.dart';
 import '../bloc/profile_bloc.dart';
 import '../bloc/profile_event.dart';
 import '../bloc/profile_state.dart';
-import '../widgets/profile_header.dart';
-import '../widgets/profile_button.dart';
-import '../widgets/tab_indicator.dart';
-import '../widgets/movie_grid_widget.dart';
 import '../widgets/empty_state_widget.dart';
+import '../widgets/movie_grid_widget.dart';
+import '../widgets/profile_header.dart';
+import '../widgets/tab_indicator.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -37,114 +37,144 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget build(BuildContext context) {
     return BlocProvider<ProfileBloc>.value(
       value: _profileBloc,
-      child: BlocListener<ProfileBloc, ProfileState>(
+      child: BlocConsumer<ProfileBloc, ProfileState>(
         listener: (context, state) {
           if (state is LogoutSuccess) {
-            // Navigate to login screen on successful logout
             context.go(AppRoutes.login);
-          } else if (state is DeleteAccountSuccess) {
-            // Navigate to login screen after successful account deletion
+          }
+          if (state is DeleteAccountSuccess) {
             context.go(AppRoutes.login);
-          } else if (state is ProfileError) {
-            // Show error snackbar
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(state.message),
-                backgroundColor: AppColors.red,
+          }
+        },
+        builder: (context, state) {
+          if (state is ProfileLoading) {
+            return const Scaffold(
+              body: Center(
+                child: CircularProgressIndicator(color: AppColors.primary),
               ),
             );
           }
-        },
-        child: BlocBuilder<ProfileBloc, ProfileState>(
-          builder: (context, state) {
-            if (state is ProfileLoading) {
-              return Center(
-                child: CircularProgressIndicator(color: AppColors.primary),
-              );
-            }
 
-            if (state is ProfileError) {
-              return Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.error_outline, color: AppColors.red, size: 60.sp),
-                    Gap(16.h),
-                    Text(
-                      state.message,
-                      style: TextStyle(
-                        color: AppColors.textPrimary,
-                        fontSize: 14.sp,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ],
-                ),
-              );
-            }
-
-          if (state is ProfileLoaded) {
-            return SingleChildScrollView(
-              child: Column(
-                children: [
-                  // Header with padding
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 24.h),
-                    child: ProfileHeader(
-                      userProfile: state.userProfile,
-                      watchListCount: state.watchList.length,
-                      historyCount: state.history.length,
+          if (state is ProfileError) {
+            return SafeArea(
+              child: Scaffold(
+                body: Center(
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 24.w),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(
+                          Icons.error_outline,
+                          color: AppColors.red,
+                          size: 60,
+                        ),
+                        Gap(16.h),
+                        Text(
+                          state.message,
+                          style: AppStyles.h5.copyWith(
+                            color: AppColors.textPrimary,
+                            fontSize: 14.sp,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        Gap(24.h),
+                        ElevatedButton(
+                          onPressed: () {
+                            _profileBloc.add(const FetchUserProfile());
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppColors.primary,
+                          ),
+                          child: const Text('Retry'),
+                        ),
+                      ],
                     ),
                   ),
+                ),
+              ),
+            );
+          }
 
-                  // Action Buttons
+          if (state is ProfileLoaded) {
+            return Scaffold(
+              body: Column(
+                children: [
+                  Gap(40.h),
+                  // Header section
+                  ProfileHeader(
+                    userProfile: state.userProfile,
+                    watchListCount: state.watchList.length,
+                    historyCount: state.history.length,
+                  ),
+
+                  Gap(24.h),
+
+                  // Action Buttons Row
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: 16.w),
-                    child: Column(
+                    child: Row(
                       children: [
                         // Edit Profile Button
-                        ProfileButton(
-                          label: 'Edit Profile',
-                          onPressed: () {
-                            // TODO: Navigate to edit profile
-                          },
-                          backgroundColor: AppColors.grey,
-                          textColor: AppColors.textPrimary,
+                        Expanded(
+                          flex: 2,
+                          child: SizedBox(
+                            height: 50.h,
+                            child: ElevatedButton(
+                              onPressed: () {
+                                context.push(AppRoutes.editProfile);
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: AppColors.primary,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12.r),
+                                ),
+                              ),
+                              child: Text(
+                                'Edit Profile',
+                                style: AppStyles.h4.copyWith(
+                                  color: AppColors.textSecondary,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ),
                         ),
-                        Gap(12.h),
-
-                        // Update Data Button
-                        ProfileButton(
-                          label: 'Update Data',
-                          onPressed: () {
-                            // TODO: Navigate to update data
-                          },
-                          backgroundColor: AppColors.grey,
-                          textColor: AppColors.textPrimary,
-                        ),
-                        Gap(12.h),
-
-                        // Exit (Logout) Button
-                        ProfileButton(
-                          label: 'Exit (Logout)',
-                          onPressed: () {
-                            _showLogoutConfirmation(context);
-                          },
-                          backgroundColor: AppColors.grey,
-                          textColor: AppColors.textPrimary,
-                          icon: Icons.exit_to_app_rounded,
-                        ),
-                        Gap(12.h),
-
-                        // Delete Account Button
-                        ProfileButton(
-                          label: 'Delete Account',
-                          onPressed: () {
-                            _showDeleteAccountConfirmation(context);
-                          },
-                          backgroundColor: AppColors.red.withOpacity(0.2),
-                          textColor: AppColors.red,
-                          icon: Icons.delete_rounded,
+                        Gap(12.w),
+                        // Exit Button
+                        Expanded(
+                          child: SizedBox(
+                            height: 50.h,
+                            child: ElevatedButton(
+                              onPressed: () {
+                                _showLogoutConfirmation(context);
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: AppColors.red,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12.r),
+                                ),
+                              ),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    'Exit',
+                                    style: AppStyles.h4.copyWith(
+                                      color: AppColors.textPrimary,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  Gap(4.w),
+                                  Icon(
+                                    Icons.logout,
+                                    color: AppColors.textPrimary,
+                                    size: 18.sp,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
                         ),
                       ],
                     ),
@@ -153,60 +183,57 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   Gap(32.h),
 
                   // Tabs Section
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 16.w),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        TabIndicator(
-                          label: 'Watch List',
-                          icon: Icons.bookmark,
-                          isSelected: state.selectedTabIndex == 0,
-                          onTap: () {
-                            context.read<ProfileBloc>().add(const SwitchTabEvent(0));
-                          },
-                        ),
-                        TabIndicator(
-                          label: 'History',
-                          icon: Icons.history,
-                          isSelected: state.selectedTabIndex == 1,
-                          onTap: () {
-                            context.read<ProfileBloc>().add(const SwitchTabEvent(1));
-                          },
-                        ),
-                      ],
-                    ),
+                  Row(
+                    children: [
+                      TabIndicator(
+                        label: 'Watch List',
+                        icon: Icons.list,
+                        isSelected: state.selectedTabIndex == 0,
+                        onTap: () {
+                          context.read<ProfileBloc>().add(const SwitchTabEvent(0));
+                        },
+                      ),
+                      TabIndicator(
+                        label: 'History',
+                        icon: Icons.folder,
+                        isSelected: state.selectedTabIndex == 1,
+                        onTap: () {
+                          context.read<ProfileBloc>().add(const SwitchTabEvent(1));
+                        },
+                      ),
+                    ],
                   ),
 
-                  Gap(24.h),
-
                   // Content based on selected tab
-                  SizedBox(
-                    height: 500.h,
-                    child: state.selectedTabIndex == 0
-                        ? _buildWatchListTab(state)
-                        : _buildHistoryTab(state),
+                  Expanded(
+                    child: Container(
+                      color: AppColors.background,
+                      child: state.selectedTabIndex == 0
+                          ? _buildWatchListTab(state)
+                          : _buildHistoryTab(state),
+                    ),
                   ),
                 ],
               ),
             );
           }
 
-          return Center(
-            child: EmptyStateWidget(
-              icon: Icons.person_outline,
-              message: 'No profile data available',
+          return const Scaffold(
+            body: Center(
+              child: EmptyStateWidget(
+                icon: Icons.person_outline,
+                message: 'No profile data available',
+              ),
             ),
           );
-          },
-        ),
+        },
       ),
     );
   }
 
   Widget _buildWatchListTab(ProfileLoaded state) {
     if (state.watchList.isEmpty) {
-      return EmptyStateWidget(
+      return const EmptyStateWidget(
         icon: Icons.bookmark_outline,
         message: 'No movies in your watch list yet',
       );
@@ -216,8 +243,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       movies: state.watchList,
       onMovieTap: (movie) {
         context.push(
-          AppRoutes.movieDetails,
-          extra: movie.movieId,
+          '${AppRoutes.movieDetails}/${movie.movieId}',
         );
       },
     );
@@ -225,7 +251,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Widget _buildHistoryTab(ProfileLoaded state) {
     if (state.history.isEmpty) {
-      return EmptyStateWidget(
+      return const EmptyStateWidget(
         icon: Icons.history,
         message: 'No watched movies in your history',
       );
@@ -235,8 +261,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       movies: state.history,
       onMovieTap: (movie) {
         context.push(
-          AppRoutes.movieDetails,
-          extra: movie.movieId,
+          '${AppRoutes.movieDetails}/${movie.movieId}',
         );
       },
     );
@@ -248,6 +273,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       builder: (BuildContext dialogContext) {
         return AlertDialog(
           backgroundColor: AppColors.grey,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.r)),
           title: Text(
             'Logout',
             style: AppStyles.h3,
@@ -267,48 +293,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
             TextButton(
               onPressed: () {
                 Navigator.pop(dialogContext);
-                context.read<ProfileBloc>().add(const LogoutEvent());
+                _profileBloc.add(const LogoutEvent());
               },
               child: Text(
                 'Logout',
-                style: AppStyles.h5.copyWith(color: AppColors.red),
-              ),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  void _showDeleteAccountConfirmation(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (BuildContext dialogContext) {
-        return AlertDialog(
-          backgroundColor: AppColors.grey,
-          title: Text(
-            'Delete Account',
-            style: AppStyles.h3.copyWith(color: AppColors.red),
-          ),
-          content: Text(
-            'This action cannot be undone. Your account and all data will be permanently deleted.',
-            style: AppStyles.h5.copyWith(color: AppColors.textTertiary),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(dialogContext),
-              child: Text(
-                'Cancel',
-                style: AppStyles.h5.copyWith(color: AppColors.textPrimary),
-              ),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.pop(dialogContext);
-                context.read<ProfileBloc>().add(const DeleteAccountEvent());
-              },
-              child: Text(
-                'Delete',
                 style: AppStyles.h5.copyWith(color: AppColors.red),
               ),
             ),

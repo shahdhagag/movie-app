@@ -19,94 +19,86 @@ class ProfileHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        // Avatar
-        Container(
-          width: 120.w,
-          height: 120.w,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            border: Border.all(
-              color: AppColors.primary,
-              width: 3.w,
-            ),
-          ),
-          child: ClipOval(
-            child: userProfile.photoUrl != null && userProfile.photoUrl!.isNotEmpty
-                ? Image.asset(
-                    userProfile.photoUrl!,
-                    fit: BoxFit.cover,
-                  )
-                : Container(
-                    color: AppColors.grey,
-                    child: Icon(
-                      Icons.person,
-                      size: 60.sp,
-                      color: AppColors.textTertiary,
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 16.w),
+      child: Row(
+        children: [
+          // Avatar & Name Column
+          Expanded(
+            flex: 2,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  width: 80.w,
+                  height: 80.w,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: AppColors.primary,
+                      width: 2.w,
                     ),
                   ),
-          ),
-        ),
-        Gap(16.h),
-
-        // Name
-        Text(
-          userProfile.displayName,
-          style: AppStyles.h3,
-          textAlign: TextAlign.center,
-        ),
-        Gap(8.h),
-
-        // Email
-        Text(
-          userProfile.email,
-          style: AppStyles.h4.copyWith(
-            color: AppColors.textTertiary,
-          ),
-          textAlign: TextAlign.center,
-        ),
-        Gap(16.h),
-
-        // Stats Row
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Column(
-              children: [
-                Text(
-                  watchListCount.toString(),
-                  style: AppStyles.h2,
-                ),
-                Text(
-                  'Watch List',
-                  style: AppStyles.h5.copyWith(
-                    fontSize: 12.sp,
-                    color: AppColors.textTertiary,
+                  child: ClipOval(
+                    child: userProfile.photoUrl != null && userProfile.photoUrl!.isNotEmpty
+                        ? Image.asset(
+                            userProfile.photoUrl!,
+                            fit: BoxFit.cover,
+                          )
+                        : Container(
+                            color: AppColors.grey,
+                            child: Icon(
+                              Icons.person,
+                              size: 40.sp,
+                              color: AppColors.textTertiary,
+                            ),
+                          ),
                   ),
+                ),
+                Gap(12.h),
+                Text(
+                  userProfile.displayName,
+                  style: AppStyles.h3.copyWith(fontSize: 18.sp),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ],
             ),
-            Gap(60.w),
-            Column(
+          ),
+          
+          // Stats
+          Expanded(
+            flex: 3,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                Text(
-                  historyCount.toString(),
-                  style: AppStyles.h2,
-                ),
-                Text(
-                  'History',
-                  style: AppStyles.h5.copyWith(
-                    fontSize: 12.sp,
-                    color: AppColors.textTertiary,
-                  ),
-                ),
+                _buildStatItem(watchListCount.toString(), 'Wish List'),
+                _buildStatItem(historyCount.toString(), 'History'),
               ],
             ),
-          ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStatItem(String count, String label) {
+    return Column(
+      children: [
+        Text(
+          count,
+          style: AppStyles.h2.copyWith(fontSize: 24.sp),
+        ),
+        Gap(4.h),
+        Text(
+          label,
+          style: AppStyles.h5.copyWith(
+            fontSize: 14.sp,
+            color: AppColors.textPrimary,
+            fontWeight: FontWeight.bold,
+          ),
         ),
       ],
     );
   }
 }
-

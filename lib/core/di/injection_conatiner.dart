@@ -33,12 +33,12 @@ import '../../features/profile/domain/repositories/profile_repository.dart';
 import '../../features/profile/domain/usecases/get_user_profile.dart';
 import '../../features/profile/domain/usecases/get_watchlist.dart';
 import '../../features/profile/domain/usecases/get_history.dart';
-import '../../features/profile/domain/usecases/get_watchlist_stream.dart';
-import '../../features/profile/domain/usecases/get_history_stream.dart';
-import '../../features/profile/domain/usecases/get_user_profile_stream.dart';
+import '../../features/profile/domain/usecases/add_to_watchlist.dart';
+import '../../features/profile/domain/usecases/add_to_history.dart';
+import '../../features/profile/domain/usecases/update_user_profile.dart';
 import '../../features/profile/domain/usecases/is_movie_in_watchlist.dart';
 import '../../features/profile/domain/usecases/is_movie_in_history.dart';
-import '../../features/profile/domain/usecases/logout.dart';
+import '../../features/profile/domain/usecases/logout.dart' as profile_logout;
 import '../../features/profile/domain/usecases/delete_account.dart';
 import '../../features/profile/presentation/bloc/profile_bloc.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -215,17 +215,6 @@ Future<void> setupLocator() async {
     () => GetHistoryUseCase(getIt<ProfileRepository>()),
   );
   
-  // Stream Use Cases
-  getIt.registerLazySingleton<GetWatchListStreamUseCase>(
-    () => GetWatchListStreamUseCase(getIt<ProfileRepository>()),
-  );
-  getIt.registerLazySingleton<GetHistoryStreamUseCase>(
-    () => GetHistoryStreamUseCase(getIt<ProfileRepository>()),
-  );
-  getIt.registerLazySingleton<GetUserProfileStreamUseCase>(
-    () => GetUserProfileStreamUseCase(getIt<ProfileRepository>()),
-  );
-
   // Helper Use Cases
   getIt.registerLazySingleton<IsMovieInWatchListUseCase>(
     () => IsMovieInWatchListUseCase(getIt<ProfileRepository>()),
@@ -234,11 +223,22 @@ Future<void> setupLocator() async {
     () => IsMovieInHistoryUseCase(getIt<ProfileRepository>()),
   );
 
-  getIt.registerLazySingleton<LogoutUseCase>(
-    () => LogoutUseCase(getIt<ProfileRepository>()),
+  getIt.registerLazySingleton<profile_logout.LogoutUseCase>(
+    () => profile_logout.LogoutUseCase(getIt<ProfileRepository>()),
   );
   getIt.registerLazySingleton<DeleteAccountUseCase>(
     () => DeleteAccountUseCase(getIt<ProfileRepository>()),
+  );
+
+  // New Profile Use Cases
+  getIt.registerLazySingleton<AddToWatchListUseCase>(
+    () => AddToWatchListUseCase(getIt<ProfileRepository>()),
+  );
+  getIt.registerLazySingleton<AddToHistoryUseCase>(
+    () => AddToHistoryUseCase(getIt<ProfileRepository>()),
+  );
+  getIt.registerLazySingleton<UpdateUserProfileUseCase>(
+    () => UpdateUserProfileUseCase(getIt<ProfileRepository>()),
   );
 
   // BLoCs
@@ -247,8 +247,11 @@ Future<void> setupLocator() async {
       getUserProfileUseCase: getIt<GetUserProfileUseCase>(),
       getWatchListUseCase: getIt<GetWatchListUseCase>(),
       getHistoryUseCase: getIt<GetHistoryUseCase>(),
-      logoutUseCase: getIt<LogoutUseCase>(),
+      logoutUseCase: getIt<profile_logout.LogoutUseCase>(),
       deleteAccountUseCase: getIt<DeleteAccountUseCase>(),
+      addToWatchListUseCase: getIt<AddToWatchListUseCase>(),
+      addToHistoryUseCase: getIt<AddToHistoryUseCase>(),
+      updateUserProfileUseCase: getIt<UpdateUserProfileUseCase>(),
     ),
   );
 }

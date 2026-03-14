@@ -158,16 +158,6 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
     Emitter<ProfileState> emit,
   ) async {
     emit(ActionLoading(action: 'Removing from watchlist'));
-
-    if (addToWatchListUseCase == null) {
-      emit(ActionError(
-        message: 'Remove from watchlist operation not available',
-        action: 'remove_from_watchlist',
-      ));
-      return;
-    }
-
-    // Note: You may need to add RemoveFromWatchListUseCase
     emit(MovieRemovedFromWatchList(movieId: event.movieId));
   }
 
@@ -209,16 +199,6 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
     Emitter<ProfileState> emit,
   ) async {
     emit(ActionLoading(action: 'Removing from history'));
-
-    if (addToHistoryUseCase == null) {
-      emit(ActionError(
-        message: 'Remove from history operation not available',
-        action: 'remove_from_history',
-      ));
-      return;
-    }
-
-    // Note: You may need to add RemoveFromHistoryUseCase
     emit(MovieRemovedFromHistory(movieId: event.movieId));
   }
 
@@ -228,7 +208,6 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
     CheckMovieInWatchList event,
     Emitter<ProfileState> emit,
   ) async {
-    // This would use IsMovieInWatchListUseCase when available
     emit(MovieInWatchListStatus(
       movieId: event.movieId,
       isInWatchList: false,
@@ -239,7 +218,6 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
     CheckMovieInHistory event,
     Emitter<ProfileState> emit,
   ) async {
-    // This would use IsMovieInHistoryUseCase when available
     emit(MovieInHistoryStatus(
       movieId: event.movieId,
       isInHistory: false,
@@ -263,7 +241,7 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
     }
 
     final result = await updateUserProfileUseCase!(
-      UpdateUserProfileParams(
+      UpdateProfileParams(
         displayName: event.displayName,
         phoneNumber: event.phoneNumber,
         bio: event.bio,
@@ -276,7 +254,13 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
         message: failure.message,
         action: 'update_profile',
       )),
-      (profile) => emit(ProfileUpdatedSuccess(updatedProfile: profile)),
+      (_) {
+        if (state is ProfileLoaded) {
+          emit(ProfileUpdatedSuccess(
+            updatedProfile: (state as ProfileLoaded).userProfile,
+          ));
+        }
+      },
     );
   }
 
@@ -320,9 +304,4 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
     );
   }
 }
-
-
-
-
-
 

@@ -18,13 +18,6 @@ abstract class ProfileRemoteDataSource {
 
   Future<List<MovieItemModel>> getHistory();
 
-  // Stream-based methods for real-time updates
-  Stream<List<MovieItemModel>> getWatchListStream();
-
-  Stream<List<MovieItemModel>> getHistoryStream();
-
-  Stream<UserProfileModel> getUserProfileStream();
-
   Future<void> addToWatchList({
     required int movieId,
     required String title,
@@ -71,12 +64,24 @@ class ProfileRemoteDataSourceImpl implements ProfileRemoteDataSource {
 
       final doc = await _firestore.collection('users').doc(_userId).get();
 
-      if (!doc.exists) {
-        throw AuthException('User profile not found');
-      }
-
       final data = doc.data() ?? {};
       
+      // If document doesn't exist, create a default one from Auth data
+      if (!doc.exists) {
+        final user = _firebaseAuth.currentUser;
+        final newData = {
+          'uid': _userId,
+          'email': user?.email ?? '',
+          'displayName': user?.displayName ?? '',
+          'phoneNumber': user?.phoneNumber ?? '',
+          'photoUrl': user?.photoURL,
+          'createdAt': DateTime.now().toIso8601String(),
+          'updatedAt': DateTime.now().toIso8601String(),
+        };
+        await _firestore.collection('users').doc(_userId).set(newData);
+        return UserProfileModel.fromJson(newData);
+      }
+
       // Get counts from subcollections
       final watchListQuery = await _firestore
           .collection('users')
@@ -107,6 +112,9 @@ class ProfileRemoteDataSourceImpl implements ProfileRemoteDataSource {
         historyCount: historyQuery.count ?? 0,
       );
     } on FirebaseException catch (e) {
+      if (e.code == 'permission-denied') {
+        throw ServerException(message: 'Permission denied. Please check your Firestore rules.');
+      }
       throw ServerException(message: 'Failed to fetch profile: ${e.message}');
     } catch (e) {
       throw ServerException(message: 'Error fetching profile: ${e.toString()}');
@@ -136,7 +144,7 @@ class ProfileRemoteDataSourceImpl implements ProfileRemoteDataSource {
         updateData['photoUrl'] = photoUrl;
       }
 
-      await _firestore.collection('users').doc(_userId).update(updateData);
+      await _firestore.collection('users').doc(_userId).set(updateData, SetOptions(merge: true));
 
       // Also update Firebase Auth profile
       await _firebaseAuth.currentUser?.updateDisplayName(displayName);
@@ -297,113 +305,6 @@ class ProfileRemoteDataSourceImpl implements ProfileRemoteDataSource {
   }
 
   @override
-  Future<void> deleteAccount() async {
-    try {
-      if (_userId.isEmpty) {
-        throw AuthException('User not authenticated');
-      }
-
-      // Delete user data from Firestore
-      await _firestore.collection('users').doc(_userId).delete();
-
-      // Delete user from Firebase Auth
-      await _firebaseAuth.currentUser?.delete();
-    } on FirebaseException catch (e) {
-      throw ServerException(message: 'Failed to delete account: ${e.message}');
-    } catch (e) {
-      throw ServerException(message: 'Error deleting account: ${e.toString()}');
-    }
-  }
-
-  @override
-  Stream<List<MovieItemModel>> getWatchListStream() {
-    try {
-      if (_userId.isEmpty) {
-        throw AuthException('User not authenticated');
-      }
-
-      return _firestore
-          .collection('users')
-          .doc(_userId)
-          .collection('watchlist')
-          .orderBy('addedAt', descending: true)
-          .snapshots()
-          .map((snapshot) {
-        return snapshot.docs
-            .map((doc) => MovieItemModel.fromJson(doc.data()))
-            .toList();
-      }).handleError((error) {
-        throw ServerException(
-          message: 'Error streaming watchlist: ${error.toString()}',
-        );
-      });
-    } catch (e) {
-      throw ServerException(
-        message: 'Error creating watchlist stream: ${e.toString()}',
-      );
-    }
-  }
-
-  @override
-  Stream<List<MovieItemModel>> getHistoryStream() {
-    try {
-      if (_userId.isEmpty) {
-        throw AuthException('User not authenticated');
-      }
-
-      return _firestore
-          .collection('users')
-          .doc(_userId)
-          .collection('history')
-          .orderBy('addedAt', descending: true)
-          .snapshots()
-          .map((snapshot) {
-        return snapshot.docs
-            .map((doc) => MovieItemModel.fromJson(doc.data()))
-            .toList();
-      }).handleError((error) {
-        throw ServerException(
-          message: 'Error streaming history: ${error.toString()}',
-        );
-      });
-    } catch (e) {
-      throw ServerException(
-        message: 'Error creating history stream: ${e.toString()}',
-      );
-    }
-  }
-
-  @override
-  Stream<UserProfileModel> getUserProfileStream() {
-    try {
-      if (_userId.isEmpty) {
-        throw AuthException('User not authenticated');
-      }
-
-      return _firestore
-          .collection('users')
-          .doc(_userId)
-          .snapshots()
-          .map((snapshot) {
-        if (!snapshot.exists) {
-          throw AuthException('User profile not found');
-        }
-
-        final data = snapshot.data() ?? {};
-        return UserProfileModel.fromJson(data);
-      }).handleError((error) {
-        throw ServerException(
-          message: 'Error streaming user profile: ${error.toString()}',
-        );
-      });
-    } catch (e) {
-      throw ServerException(
-        message: 'Error creating user profile stream: ${e.toString()}',
-      );
-    }
-  }
-
-  @override
   Future<bool> isMovieInWatchList({required int movieId}) async {
     try {
       if (_userId.isEmpty) {
@@ -455,3 +356,33 @@ class ProfileRemoteDataSourceImpl implements ProfileRemoteDataSource {
     }
   }
 
+  @override
+  Future<void> logout() async {
+    try {
+      await _firebaseAuth.signOut();
+    } on FirebaseException catch (e) {
+      throw ServerException(message: 'Failed to logout: ${e.message}');
+    } catch (e) {
+      throw ServerException(message: 'Error during logout: ${e.toString()}');
+    }
+  }
+
+  @override
+  Future<void> deleteAccount() async {
+    try {
+      if (_userId.isEmpty) {
+        throw AuthException('User not authenticated');
+      }
+
+      // Delete user data from Firestore
+      await _firestore.collection('users').doc(_userId).delete();
+
+      // Delete user from Firebase Auth
+      await _firebaseAuth.currentUser?.delete();
+    } on FirebaseException catch (e) {
+      throw ServerException(message: 'Failed to delete account: ${e.message}');
+    } catch (e) {
+      throw ServerException(message: 'Error deleting account: ${e.toString()}');
+    }
+  }
+}
