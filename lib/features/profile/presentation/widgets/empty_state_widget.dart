@@ -1,41 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:gap/gap.dart';
-import '../../../../core/utils/app_colors.dart';
-import '../../../../core/utils/app_styles.dart';
+import '../../../../core/utils/app_assets.dart';
 
 class EmptyStateWidget extends StatelessWidget {
-  final String message;
-  final IconData icon;
+  final String? imagePath;
 
   const EmptyStateWidget({
-    Key? key,
-    required this.message,
-    required this.icon,
-  }) : super(key: key);
+    super.key,
+    this.imagePath,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            icon,
-            size: 80.sp,
-            color: AppColors.textTertiary,
-          ),
-          Gap(16.h),
-          Text(
-            message,
-            style: AppStyles.h4.copyWith(
-              color: AppColors.textTertiary,
-            ),
-            textAlign: TextAlign.center,
-          ),
-        ],
+      child: Image.asset(
+        imagePath ?? AppAssets.emptyStateSearchList,
+        width: 150.w,
+        height: 150.h,
+        fit: BoxFit.contain,
       ),
     );
   }
 }
-

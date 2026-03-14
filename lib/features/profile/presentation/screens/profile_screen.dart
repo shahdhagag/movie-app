@@ -112,14 +112,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
                   // Action Buttons Row
                   Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 16.w),
+                    padding: EdgeInsets.symmetric(horizontal: 17.w),
                     child: Row(
                       children: [
                         // Edit Profile Button
                         Expanded(
                           flex: 2,
                           child: SizedBox(
-                            height: 50.h,
+                            height: 60.h,
+
                             child: ElevatedButton(
                               onPressed: () {
                                 context.push(AppRoutes.editProfile);
@@ -127,12 +128,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: AppColors.primary,
                                 shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12.r),
+                                  borderRadius: BorderRadius.circular(15.r),
                                 ),
                               ),
                               child: Text(
                                 'Edit Profile',
                                 style: AppStyles.h4.copyWith(
+                                  fontSize: 20.sp,
                                   color: AppColors.textSecondary,
                                   fontWeight: FontWeight.bold,
                                 ),
@@ -144,7 +146,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         // Exit Button
                         Expanded(
                           child: SizedBox(
-                            height: 50.h,
+                            height: 60.h,
                             child: ElevatedButton(
                               onPressed: () {
                                 _showLogoutConfirmation(context);
@@ -152,7 +154,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: AppColors.red,
                                 shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12.r),
+                                  borderRadius: BorderRadius.circular(15.r),
                                 ),
                               ),
                               child: Row(
@@ -161,15 +163,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   Text(
                                     'Exit',
                                     style: AppStyles.h4.copyWith(
+                                      fontSize: 20.sp,
                                       color: AppColors.textPrimary,
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
-                                  Gap(4.w),
+                                  Gap(10.w),
                                   Icon(
                                     Icons.logout,
                                     color: AppColors.textPrimary,
-                                    size: 18.sp,
+                                    size: 20.sp,
                                   ),
                                 ],
                               ),
@@ -206,6 +209,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
                   // Content based on selected tab
                   Expanded(
+                    flex: 1,
                     child: Container(
                       color: AppColors.background,
                       child: state.selectedTabIndex == 0
@@ -220,10 +224,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
           return const Scaffold(
             body: Center(
-              child: EmptyStateWidget(
-                icon: Icons.person_outline,
-                message: 'No profile data available',
-              ),
+              child: EmptyStateWidget(),
             ),
           );
         },
@@ -233,10 +234,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Widget _buildWatchListTab(ProfileLoaded state) {
     if (state.watchList.isEmpty) {
-      return const EmptyStateWidget(
-        icon: Icons.bookmark_outline,
-        message: 'No movies in your watch list yet',
-      );
+      return const EmptyStateWidget();
     }
 
     return MovieGridWidget(
@@ -251,10 +249,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Widget _buildHistoryTab(ProfileLoaded state) {
     if (state.history.isEmpty) {
-      return const EmptyStateWidget(
-        icon: Icons.history,
-        message: 'No watched movies in your history',
-      );
+      return const EmptyStateWidget();
     }
 
     return MovieGridWidget(

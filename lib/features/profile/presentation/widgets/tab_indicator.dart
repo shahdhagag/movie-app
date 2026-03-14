@@ -29,14 +29,14 @@ class TabIndicator extends StatelessWidget {
             Icon(
               icon,
               color: isSelected ? AppColors.primary : AppColors.textPrimary,
-              size: 28.sp,
+              size: 40.sp,
             ),
             SizedBox(height: 8.h),
             // Label
             Text(
               label,
               style: AppStyles.h5.copyWith(
-                fontSize: 16.sp,
+                fontSize: 20.sp,
                 color: isSelected ? AppColors.textPrimary : AppColors.textPrimary,
                 fontWeight: FontWeight.bold,
               ),
@@ -45,7 +45,7 @@ class TabIndicator extends StatelessWidget {
             // Underline indicator
             Container(
               width: double.infinity,
-              height: 2.h,
+              height: 3.h,
               color: isSelected ? AppColors.primary : Colors.transparent,
             ),
           ],

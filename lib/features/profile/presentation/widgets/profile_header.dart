@@ -20,18 +20,23 @@ class ProfileHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 16.w),
+
+      padding: EdgeInsets.symmetric(horizontal: 25.w,vertical: 20.h),
       child: Row(
         children: [
+
           // Avatar & Name Column
           Expanded(
             flex: 2,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                SizedBox(
+                  height: 40.h,
+                ),
                 Container(
-                  width: 80.w,
-                  height: 80.w,
+                  width: 118.w,
+                  height: 118.w,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     border: Border.all(
@@ -58,7 +63,7 @@ class ProfileHeader extends StatelessWidget {
                 Gap(12.h),
                 Text(
                   userProfile.displayName,
-                  style: AppStyles.h3.copyWith(fontSize: 18.sp),
+                  style: AppStyles.h3.copyWith(fontSize: 22.sp,fontWeight: FontWeight.w700),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -87,15 +92,15 @@ class ProfileHeader extends StatelessWidget {
       children: [
         Text(
           count,
-          style: AppStyles.h2.copyWith(fontSize: 24.sp),
+          style: AppStyles.h2.copyWith(fontSize: 35.sp,fontWeight: FontWeight.w700),
         ),
         Gap(4.h),
         Text(
           label,
           style: AppStyles.h5.copyWith(
-            fontSize: 14.sp,
+            fontSize: 25.sp,
             color: AppColors.textPrimary,
-            fontWeight: FontWeight.bold,
+            fontWeight: FontWeight.w700,
           ),
         ),
       ],

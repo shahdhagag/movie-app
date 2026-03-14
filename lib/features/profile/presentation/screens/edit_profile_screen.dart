@@ -1,11 +1,10 @@
-import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../../core/di/injection_conatiner.dart';
+import '../../../../config/routes/app_routes.dart';
 import '../../../../core/utils/app_assets.dart';
 import '../../../../core/utils/app_colors.dart';
 import '../../../../core/utils/app_styles.dart';
@@ -66,6 +65,62 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     super.dispose();
   }
 
+  void _showAvatarPicker() {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: AppColors.grey,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24.r)),
+      ),
+      builder: (context) {
+        return Container(
+          padding: EdgeInsets.all(24.w),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                '',
+                style: AppStyles.h4.copyWith(color: AppColors.primary),
+              ),
+              Gap(20.h),
+              GridView.builder(
+                shrinkWrap: true,
+                itemCount: _avatarList.length,
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 3,
+                  mainAxisSpacing: 16.h,
+                  crossAxisSpacing: 16.w,
+                ),
+                itemBuilder: (context, index) {
+                  final avatar = _avatarList[index];
+                  final isSelected = _selectedAvatar == avatar;
+                  return GestureDetector(
+                    onTap: () {
+                      setState(() => _selectedAvatar = avatar);
+                      Navigator.pop(context);
+                    },
+                    child: Container(
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: isSelected
+                            ? Border.all(color: AppColors.primary, width: 2.w)
+                            : null,
+                      ),
+                      child: ClipOval(
+                        child: Image.asset(avatar, fit: BoxFit.cover),
+                      ),
+                    ),
+                  );
+                },
+              ),
+              Gap(20.h),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   void _handleUpdate() {
     if (_formKey.currentState!.validate()) {
       _profileBloc.add(
@@ -87,7 +142,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         elevation: 0,
         leading: IconButton(
           onPressed: () => context.pop(),
-          icon: Icon(Icons.arrow_back, color: AppColors.primary, size: 24.sp),
+          icon: Icon(Icons.arrow_back_rounded, color: AppColors.primary, size: 27.sp),
         ),
         title: Text(
           'Pick Avatar',
@@ -101,12 +156,14 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(content: Text('Profile updated successfully')),
             );
-            context.pop();
             _profileBloc.add(const FetchUserProfile());
+            context.go(AppRoutes.main);
           } else if (state is ActionError && state.action == 'update_profile') {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(content: Text(state.message), backgroundColor: AppColors.red),
             );
+          } else if (state is LogoutSuccess || state is DeleteAccountSuccess) {
+             context.go(AppRoutes.login);
           }
         },
         child: SingleChildScrollView(
@@ -116,16 +173,19 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             child: Column(
               children: [
                 Gap(20.h),
-                // Large Circular Avatar
-                Container(
-                  width: 150.w,
-                  height: 150.w,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    border: Border.all(color: AppColors.primary, width: 2.w),
-                  ),
-                  child: ClipOval(
-                    child: Image.asset(_selectedAvatar, fit: BoxFit.cover),
+                // Large Circular Avatar - Trigger BottomSheet
+                GestureDetector(
+                  onTap: _showAvatarPicker,
+                  child: Container(
+                    width: 150.w,
+                    height: 150.w,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(color: AppColors.primary, width: 1.w),
+                    ),
+                    child: ClipOval(
+                      child: Image.asset(_selectedAvatar, fit: BoxFit.cover),
+                    ),
                   ),
                 ),
                 Gap(40.h),
@@ -133,7 +193,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 AuthTextField(
                   hintText: 'Name',
                   controller: _nameController,
-                  prefixIcon: Icon(Icons.person, color: AppColors.textTertiary),
+                  prefixIcon: Image.asset(AppAssets.userIcon, width: 20.w, height: 20.h,),
                   validator: AppValidators.validateName,
                 ),
                 Gap(20.h),
@@ -141,83 +201,49 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 AuthTextField(
                   hintText: 'Phone number',
                   controller: _phoneController,
-                  prefixIcon: Icon(Icons.phone, color: AppColors.textTertiary),
+                  prefixIcon: Image.asset(AppAssets.phoneIcon, width: 20.w, height: 20.h),
                   validator: AppValidators.validatePhone,
                 ),
-                Gap(30.h),
+                Gap(20.h),
                 // Reset Password Text
                 Align(
                   alignment: Alignment.centerLeft,
-                  child: Text(
-                    'Reset Password',
-                    style: AppStyles.h5.copyWith(color: AppColors.textTertiary),
-                  ),
-                ),
-                Gap(40.h),
-                // Avatar Grid in a Container
-                Container(
-                  padding: EdgeInsets.all(16.w),
-                  decoration: BoxDecoration(
-                    color: AppColors.grey.withOpacity(0.3),
-                    borderRadius: BorderRadius.circular(24.r),
-                  ),
-                  child: GridView.builder(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 3,
-                      mainAxisSpacing: 16.h,
-                      crossAxisSpacing: 16.w,
+                  child: TextButton(
+                    onPressed: () {}, // Handle reset password
+                    child: Text(
+                      'Reset Password',
+                      style: AppStyles.h5.copyWith(color: AppColors.textPrimary),
                     ),
-                    itemCount: _avatarList.length,
-                    itemBuilder: (context, index) {
-                      final avatar = _avatarList[index];
-                      final isSelected = _selectedAvatar == avatar;
-                      return GestureDetector(
-                        onTap: () => setState(() => _selectedAvatar = avatar),
-                        child: Container(
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            border: isSelected
-                                ? Border.all(color: AppColors.primary, width: 2.w)
-                                : null,
-                          ),
-                          child: ClipOval(
-                            child: Image.asset(avatar, fit: BoxFit.cover),
-                          ),
-                        ),
-                      );
-                    },
                   ),
                 ),
-                Gap(40.h),
+                Gap(310.h),
                 // Delete Account Button
                 SizedBox(
                   width: double.infinity,
-                  height: 50.h,
+                  height: 60.h,
                   child: ElevatedButton(
                     onPressed: () {
-                      // Handle delete confirmation
+                       _showDeleteAccountConfirmation(context);
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.red,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15.r)),
                     ),
-                    child: Text('Delete Account', style: AppStyles.h5.copyWith(color: AppColors.textPrimary)),
+                    child: Text('Delete Account', style: AppStyles.h4.copyWith(color: AppColors.textPrimary, fontWeight: FontWeight.bold)),
                   ),
                 ),
                 Gap(16.h),
                 // Update Data Button
                 SizedBox(
                   width: double.infinity,
-                  height: 50.h,
+                  height: 60.h,
                   child: ElevatedButton(
                     onPressed: _handleUpdate,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.primary,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15.r)),
                     ),
-                    child: Text('Update Data', style: AppStyles.h5.copyWith(color: AppColors.textSecondary, fontWeight: FontWeight.bold)),
+                    child: Text('Update Data', style: AppStyles.h4.copyWith(color: AppColors.textSecondary, fontWeight: FontWeight.bold)),
                   ),
                 ),
                 Gap(40.h),
@@ -226,6 +252,45 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           ),
         ),
       ),
+    );
+  }
+
+  void _showDeleteAccountConfirmation(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext dialogContext) {
+        return AlertDialog(
+          backgroundColor: AppColors.grey,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.r)),
+          title: Text(
+            'Delete Account',
+            style: AppStyles.h3.copyWith(color: AppColors.red),
+          ),
+          content: Text(
+            'This action cannot be undone. Your account and all data will be permanently deleted.',
+            style: AppStyles.h5.copyWith(color: AppColors.textTertiary),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext),
+              child: Text(
+                'Cancel',
+                style: AppStyles.h5.copyWith(color: AppColors.textPrimary),
+              ),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.pop(dialogContext);
+                _profileBloc.add(const DeleteAccountEvent());
+              },
+              child: Text(
+                'Delete',
+                style: AppStyles.h5.copyWith(color: AppColors.red),
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 }
