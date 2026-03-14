@@ -17,6 +17,13 @@ abstract class ProfileRepository {
 
   Future<Either<Failure, List<MovieItem>>> getHistory();
 
+  // Stream-based methods for real-time updates
+  Stream<Either<Failure, List<MovieItem>>> getWatchListStream();
+
+  Stream<Either<Failure, List<MovieItem>>> getHistoryStream();
+
+  Stream<Either<Failure, UserProfile>> getUserProfileStream();
+
   Future<Either<Failure, void>> addToWatchList({
     required int movieId,
     required String title,
@@ -33,8 +40,13 @@ abstract class ProfileRepository {
 
   Future<Either<Failure, void>> removeFromHistory({required int movieId});
 
+  Future<Either<Failure, bool>> isMovieInWatchList({required int movieId});
+
+  Future<Either<Failure, bool>> isMovieInHistory({required int movieId});
+
   Future<Either<Failure, void>> deleteAccount();
 
   Future<Either<Failure, void>> logout();
 }
+
 

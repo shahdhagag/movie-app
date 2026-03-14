@@ -178,8 +178,94 @@ class ProfileRepositoryImpl implements ProfileRepository {
       return Left(ServerFailure('Error during logout: ${e.toString()}'));
     }
   }
+
+  @override
+  Stream<Either<Failure, List<MovieItem>>> getWatchListStream() {
+    try {
+      return remoteDataSource.getWatchListStream().map((models) {
+        final entities = models.map((model) => model.toEntity()).toList();
+        return Right(entities);
+      }).handleError((error) {
+        if (error is AuthException) {
+          return Left(AuthFailure(error.toString()));
+        } else if (error is ServerException) {
+          return Left(ServerFailure(error.message));
+        }
+        return Left(ServerFailure('Error streaming watchlist: ${error.toString()}'));
+      });
+    } catch (e) {
+      return Stream.value(
+        Left(ServerFailure('Error creating watchlist stream: ${e.toString()}')),
+      );
+    }
+  }
+
+  @override
+  Stream<Either<Failure, List<MovieItem>>> getHistoryStream() {
+    try {
+      return remoteDataSource.getHistoryStream().map((models) {
+        final entities = models.map((model) => model.toEntity()).toList();
+        return Right(entities);
+      }).handleError((error) {
+        if (error is AuthException) {
+          return Left(AuthFailure(error.toString()));
+        } else if (error is ServerException) {
+          return Left(ServerFailure(error.message));
+        }
+        return Left(ServerFailure('Error streaming history: ${error.toString()}'));
+      });
+    } catch (e) {
+      return Stream.value(
+        Left(ServerFailure('Error creating history stream: ${e.toString()}')),
+      );
+    }
+  }
+
+  @override
+  Stream<Either<Failure, UserProfile>> getUserProfileStream() {
+    try {
+      return remoteDataSource.getUserProfileStream().map((model) {
+        return Right(model.toEntity());
+      }).handleError((error) {
+        if (error is AuthException) {
+          return Left(AuthFailure(error.toString()));
+        } else if (error is ServerException) {
+          return Left(ServerFailure(error.message));
+        }
+        return Left(ServerFailure('Error streaming profile: ${error.toString()}'));
+      });
+    } catch (e) {
+      return Stream.value(
+        Left(ServerFailure('Error creating profile stream: ${e.toString()}')),
+      );
+    }
+  }
+
+  @override
+  Future<Either<Failure, bool>> isMovieInWatchList({required int movieId}) async {
+    try {
+      final result = await remoteDataSource.isMovieInWatchList(movieId: movieId);
+      return Right(result);
+    } on AuthException catch (e) {
+      return Left(AuthFailure(e.toString()));
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message));
+    } catch (e) {
+      return Left(ServerFailure('Error checking watchlist: ${e.toString()}'));
+    }
+  }
+
+  @override
+  Future<Either<Failure, bool>> isMovieInHistory({required int movieId}) async {
+    try {
+      final result = await remoteDataSource.isMovieInHistory(movieId: movieId);
+      return Right(result);
+    } on AuthException catch (e) {
+      return Left(AuthFailure(e.toString()));
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message));
+    } catch (e) {
+      return Left(ServerFailure('Error checking history: ${e.toString()}'));
+    }
+  }
 }
-
-
-
-

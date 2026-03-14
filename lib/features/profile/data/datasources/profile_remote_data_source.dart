@@ -18,6 +18,13 @@ abstract class ProfileRemoteDataSource {
 
   Future<List<MovieItemModel>> getHistory();
 
+  // Stream-based methods for real-time updates
+  Stream<List<MovieItemModel>> getWatchListStream();
+
+  Stream<List<MovieItemModel>> getHistoryStream();
+
+  Stream<UserProfileModel> getUserProfileStream();
+
   Future<void> addToWatchList({
     required int movieId,
     required String title,
@@ -33,6 +40,10 @@ abstract class ProfileRemoteDataSource {
   Future<void> removeFromWatchList({required int movieId});
 
   Future<void> removeFromHistory({required int movieId});
+
+  Future<bool> isMovieInWatchList({required int movieId});
+
+  Future<bool> isMovieInHistory({required int movieId});
 
   Future<void> deleteAccount();
 
@@ -305,17 +316,142 @@ class ProfileRemoteDataSourceImpl implements ProfileRemoteDataSource {
   }
 
   @override
-  Future<void> logout() async {
+  Stream<List<MovieItemModel>> getWatchListStream() {
     try {
-      await _firebaseAuth.signOut();
-    } on FirebaseException catch (e) {
-      throw ServerException(message: 'Failed to logout: ${e.message}');
+      if (_userId.isEmpty) {
+        throw AuthException('User not authenticated');
+      }
+
+      return _firestore
+          .collection('users')
+          .doc(_userId)
+          .collection('watchlist')
+          .orderBy('addedAt', descending: true)
+          .snapshots()
+          .map((snapshot) {
+        return snapshot.docs
+            .map((doc) => MovieItemModel.fromJson(doc.data()))
+            .toList();
+      }).handleError((error) {
+        throw ServerException(
+          message: 'Error streaming watchlist: ${error.toString()}',
+        );
+      });
     } catch (e) {
-      throw ServerException(message: 'Error during logout: ${e.toString()}');
+      throw ServerException(
+        message: 'Error creating watchlist stream: ${e.toString()}',
+      );
     }
   }
-}
 
+  @override
+  Stream<List<MovieItemModel>> getHistoryStream() {
+    try {
+      if (_userId.isEmpty) {
+        throw AuthException('User not authenticated');
+      }
 
+      return _firestore
+          .collection('users')
+          .doc(_userId)
+          .collection('history')
+          .orderBy('addedAt', descending: true)
+          .snapshots()
+          .map((snapshot) {
+        return snapshot.docs
+            .map((doc) => MovieItemModel.fromJson(doc.data()))
+            .toList();
+      }).handleError((error) {
+        throw ServerException(
+          message: 'Error streaming history: ${error.toString()}',
+        );
+      });
+    } catch (e) {
+      throw ServerException(
+        message: 'Error creating history stream: ${e.toString()}',
+      );
+    }
+  }
 
+  @override
+  Stream<UserProfileModel> getUserProfileStream() {
+    try {
+      if (_userId.isEmpty) {
+        throw AuthException('User not authenticated');
+      }
+
+      return _firestore
+          .collection('users')
+          .doc(_userId)
+          .snapshots()
+          .map((snapshot) {
+        if (!snapshot.exists) {
+          throw AuthException('User profile not found');
+        }
+
+        final data = snapshot.data() ?? {};
+        return UserProfileModel.fromJson(data);
+      }).handleError((error) {
+        throw ServerException(
+          message: 'Error streaming user profile: ${error.toString()}',
+        );
+      });
+    } catch (e) {
+      throw ServerException(
+        message: 'Error creating user profile stream: ${e.toString()}',
+      );
+    }
+  }
+
+  @override
+  Future<bool> isMovieInWatchList({required int movieId}) async {
+    try {
+      if (_userId.isEmpty) {
+        throw AuthException('User not authenticated');
+      }
+
+      final doc = await _firestore
+          .collection('users')
+          .doc(_userId)
+          .collection('watchlist')
+          .doc(movieId.toString())
+          .get();
+
+      return doc.exists;
+    } on FirebaseException catch (e) {
+      throw ServerException(
+        message: 'Failed to check watchlist: ${e.message}',
+      );
+    } catch (e) {
+      throw ServerException(
+        message: 'Error checking watchlist: ${e.toString()}',
+      );
+    }
+  }
+
+  @override
+  Future<bool> isMovieInHistory({required int movieId}) async {
+    try {
+      if (_userId.isEmpty) {
+        throw AuthException('User not authenticated');
+      }
+
+      final doc = await _firestore
+          .collection('users')
+          .doc(_userId)
+          .collection('history')
+          .doc(movieId.toString())
+          .get();
+
+      return doc.exists;
+    } on FirebaseException catch (e) {
+      throw ServerException(
+        message: 'Failed to check history: ${e.message}',
+      );
+    } catch (e) {
+      throw ServerException(
+        message: 'Error checking history: ${e.toString()}',
+      );
+    }
+  }
 

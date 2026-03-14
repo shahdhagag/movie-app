@@ -33,6 +33,11 @@ import '../../features/profile/domain/repositories/profile_repository.dart';
 import '../../features/profile/domain/usecases/get_user_profile.dart';
 import '../../features/profile/domain/usecases/get_watchlist.dart';
 import '../../features/profile/domain/usecases/get_history.dart';
+import '../../features/profile/domain/usecases/get_watchlist_stream.dart';
+import '../../features/profile/domain/usecases/get_history_stream.dart';
+import '../../features/profile/domain/usecases/get_user_profile_stream.dart';
+import '../../features/profile/domain/usecases/is_movie_in_watchlist.dart';
+import '../../features/profile/domain/usecases/is_movie_in_history.dart';
 import '../../features/profile/domain/usecases/logout.dart';
 import '../../features/profile/domain/usecases/delete_account.dart';
 import '../../features/profile/presentation/bloc/profile_bloc.dart';
@@ -209,6 +214,26 @@ Future<void> setupLocator() async {
   getIt.registerLazySingleton<GetHistoryUseCase>(
     () => GetHistoryUseCase(getIt<ProfileRepository>()),
   );
+  
+  // Stream Use Cases
+  getIt.registerLazySingleton<GetWatchListStreamUseCase>(
+    () => GetWatchListStreamUseCase(getIt<ProfileRepository>()),
+  );
+  getIt.registerLazySingleton<GetHistoryStreamUseCase>(
+    () => GetHistoryStreamUseCase(getIt<ProfileRepository>()),
+  );
+  getIt.registerLazySingleton<GetUserProfileStreamUseCase>(
+    () => GetUserProfileStreamUseCase(getIt<ProfileRepository>()),
+  );
+
+  // Helper Use Cases
+  getIt.registerLazySingleton<IsMovieInWatchListUseCase>(
+    () => IsMovieInWatchListUseCase(getIt<ProfileRepository>()),
+  );
+  getIt.registerLazySingleton<IsMovieInHistoryUseCase>(
+    () => IsMovieInHistoryUseCase(getIt<ProfileRepository>()),
+  );
+
   getIt.registerLazySingleton<LogoutUseCase>(
     () => LogoutUseCase(getIt<ProfileRepository>()),
   );
