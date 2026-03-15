@@ -213,8 +213,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   controller: _nameController,
                   prefixIcon: Image.asset(
                     AppAssets.userIcon,
-                    width: 20.w,
-                    height: 20.h,
+                    width: 10.w,
+                    height: 10.h,
                   ),
                   validator: AppValidators.validateName,
                 ),
@@ -225,8 +225,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   controller: _phoneController,
                   prefixIcon: Image.asset(
                     AppAssets.phoneIcon,
-                    width: 20.w,
-                    height: 20.h,
+                    width: 10.w,
+                    height: 10.h,
                   ),
                   validator: AppValidators.validatePhone,
                 ),
