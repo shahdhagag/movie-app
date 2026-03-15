@@ -16,9 +16,7 @@ class AppRoutes {
   static const String profile = '/profile';
   static const String browse = '/Browse';
 
-  static const String moviesByGenre = '/movies-by-genre';
-  static const String moviesByCategory = '/movies-by-category';
-  static const String watchMovie = '/watch-movie';
+
 
   static const String editProfile = '/edit-profile';
   static const String updateProfile = '/update-profile';
@@ -26,8 +24,5 @@ class AppRoutes {
   static const String watchlist = '/watchlist';
   static const String settings = '/settings';
 
-  static const String about = '/about';
-  static const String privacy = '/privacy';
-  static const String terms = '/terms';
 }
 
