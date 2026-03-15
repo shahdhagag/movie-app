@@ -46,10 +46,14 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     super.initState();
     _profileBloc = context.read<ProfileBloc>();
     final state = _profileBloc.state;
-    
+
     if (state is ProfileLoaded) {
-      _nameController = TextEditingController(text: state.userProfile.displayName);
-      _phoneController = TextEditingController(text: state.userProfile.phoneNumber);
+      _nameController = TextEditingController(
+        text: state.userProfile.displayName,
+      );
+      _phoneController = TextEditingController(
+        text: state.userProfile.phoneNumber,
+      );
       _selectedAvatar = state.userProfile.photoUrl ?? _avatarList[0];
     } else {
       _nameController = TextEditingController();
@@ -78,10 +82,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(
-                '',
-                style: AppStyles.h4.copyWith(color: AppColors.primary),
-              ),
+              Text('', style: AppStyles.h4.copyWith(color: AppColors.primary)),
               Gap(20.h),
               GridView.builder(
                 shrinkWrap: true,
@@ -136,7 +137,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   @override
   Widget build(BuildContext context) {
     final blocState = context.watch<ProfileBloc>().state;
-    final isDeleting = blocState is ActionLoading && blocState.action == 'Deleting account';
+    final isDeleting =
+        blocState is ActionLoading && blocState.action == 'Deleting account';
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -145,7 +147,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         elevation: 0,
         leading: IconButton(
           onPressed: () => context.pop(),
-          icon: Icon(Icons.arrow_back_rounded, color: AppColors.primary, size: 27.sp),
+          icon: Icon(
+            Icons.arrow_back_rounded,
+            color: AppColors.primary,
+            size: 27.sp,
+          ),
         ),
         title: Text(
           'Pick Avatar',
@@ -162,14 +168,20 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             context.go(AppRoutes.profile);
           } else if (state is ActionError && state.action == 'update_profile') {
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(state.message), backgroundColor: AppColors.red),
+              SnackBar(
+                content: Text(state.message),
+                backgroundColor: AppColors.red,
+              ),
             );
           } else if (state is ActionError && state.action == 'delete_account') {
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(state.message), backgroundColor: AppColors.red),
+              SnackBar(
+                content: Text(state.message),
+                backgroundColor: AppColors.red,
+              ),
             );
           } else if (state is LogoutSuccess || state is DeleteAccountSuccess) {
-             context.go(AppRoutes.login);
+            context.go(AppRoutes.login);
           }
         },
         child: SingleChildScrollView(
@@ -199,7 +211,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 AuthTextField(
                   hintText: 'Name',
                   controller: _nameController,
-                  prefixIcon: Image.asset(AppAssets.userIcon, width: 20.w, height: 20.h,),
+                  prefixIcon: Image.asset(
+                    AppAssets.userIcon,
+                    width: 20.w,
+                    height: 20.h,
+                  ),
                   validator: AppValidators.validateName,
                 ),
                 Gap(20.h),
@@ -207,7 +223,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 AuthTextField(
                   hintText: 'Phone number',
                   controller: _phoneController,
-                  prefixIcon: Image.asset(AppAssets.phoneIcon, width: 20.w, height: 20.h),
+                  prefixIcon: Image.asset(
+                    AppAssets.phoneIcon,
+                    width: 20.w,
+                    height: 20.h,
+                  ),
                   validator: AppValidators.validatePhone,
                 ),
                 Gap(20.h),
@@ -215,10 +235,28 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 Align(
                   alignment: Alignment.centerLeft,
                   child: TextButton(
-                    onPressed: () {}, // Handle reset password
+                    onPressed: () async {
+                      try {
+                        await context.push(AppRoutes.forgotPassword);
+                      } catch (_) {
+                        if (!mounted) {
+                          return;
+                        }
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text(
+                              'Unable to open reset password screen right now.',
+                            ),
+                            backgroundColor: AppColors.red,
+                          ),
+                        );
+                      }
+                    },
                     child: Text(
                       'Reset Password',
-                      style: AppStyles.h5.copyWith(color: AppColors.textPrimary),
+                      style: AppStyles.h5.copyWith(
+                        color: AppColors.textPrimary,
+                      ),
                     ),
                   ),
                 ),
@@ -228,12 +266,16 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   width: double.infinity,
                   height: 60.h,
                   child: ElevatedButton(
-                    onPressed: isDeleting ? null : () {
-                       _showDeleteAccountConfirmation(context);
-                    },
+                    onPressed: isDeleting
+                        ? null
+                        : () {
+                            _showDeleteAccountConfirmation(context);
+                          },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.red,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15.r)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(15.r),
+                      ),
                     ),
                     child: isDeleting
                         ? SizedBox(
@@ -262,9 +304,17 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     onPressed: _handleUpdate,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.primary,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15.r)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(15.r),
+                      ),
                     ),
-                    child: Text('Update Data', style: AppStyles.h4.copyWith(color: AppColors.textSecondary, fontWeight: FontWeight.bold)),
+                    child: Text(
+                      'Update Data',
+                      style: AppStyles.h4.copyWith(
+                        color: AppColors.textSecondary,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ),
                 ),
                 Gap(40.h),
@@ -282,7 +332,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       builder: (BuildContext dialogContext) {
         return AlertDialog(
           backgroundColor: AppColors.grey,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.r)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16.r),
+          ),
           title: Text(
             'Delete Account',
             style: AppStyles.h3.copyWith(color: AppColors.red),
