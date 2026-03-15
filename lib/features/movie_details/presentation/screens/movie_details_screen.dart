@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
+import '../../../profile/domain/usecases/add_to_history.dart';
 import '../../../../core/di/injection_conatiner.dart';
 import '../../../../core/utils/app_colors.dart';
 import '../bloc/movie_details_bloc.dart';
@@ -17,7 +18,7 @@ import '../widgets/similar_movies_section.dart';
 import '../widgets/summary_section.dart';
 import '../widgets/watch_button.dart';
 
-class MovieDetailsScreen extends StatelessWidget {
+class MovieDetailsScreen extends StatefulWidget {
   final int movieId;
 
   const MovieDetailsScreen({
@@ -26,13 +27,60 @@ class MovieDetailsScreen extends StatelessWidget {
   });
 
   @override
+  State<MovieDetailsScreen> createState() => _MovieDetailsScreenState();
+}
+
+class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
+  bool _historySaved = false;
+
+  Future<void> _saveToHistory(MovieDetailsLoaded state) async {
+    if (_historySaved) {
+      return;
+    }
+
+    final movie = state.movieDetails;
+    final posterPath = movie.largeCoverImage ?? movie.mediumCoverImage ?? movie.smallCoverImage ?? '';
+
+    final result = await getIt<AddToHistoryUseCase>()(
+      AddToHistoryParams(
+        movieId: movie.id,
+        title: movie.title,
+        posterPath: posterPath,
+      ),
+    );
+
+    if (!mounted) {
+      return;
+    }
+
+    result.fold(
+      (failure) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(failure.message),
+            backgroundColor: AppColors.red,
+          ),
+        );
+      },
+      (_) {
+        _historySaved = true;
+      },
+    );
+  }
+
+  @override
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (context) => getIt<MovieDetailsBloc>()
-        ..add(LoadMovieDetails(movieId: movieId)),
+        ..add(LoadMovieDetails(movieId: widget.movieId)),
       child: Scaffold(
         backgroundColor: AppColors.background,
-        body: BlocBuilder<MovieDetailsBloc, MovieDetailsState>(
+        body: BlocConsumer<MovieDetailsBloc, MovieDetailsState>(
+          listener: (context, state) {
+            if (state is MovieDetailsLoaded) {
+              _saveToHistory(state);
+            }
+          },
           builder: (context, state) {
             if (state is MovieDetailsLoading) {
               return Center(
@@ -63,7 +111,7 @@ class MovieDetailsScreen extends StatelessWidget {
                       onPressed: () {
                         context
                             .read<MovieDetailsBloc>()
-                            .add(LoadMovieDetails(movieId: movieId));
+                            .add(LoadMovieDetails(movieId: widget.movieId));
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.primary,

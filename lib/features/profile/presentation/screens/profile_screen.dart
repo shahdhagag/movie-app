@@ -201,7 +201,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         icon: Icons.folder,
                         isSelected: state.selectedTabIndex == 1,
                         onTap: () {
-                          context.read<ProfileBloc>().add(const SwitchTabEvent(1));
+                          context.read<ProfileBloc>().add(
+                            const FetchUserProfile(
+                              selectedTabIndex: 1,
+                              verifyFreshness: true,
+                            ),
+                          );
                         },
                       ),
                     ],
@@ -242,7 +247,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
       onMovieTap: (movie) {
         context.push(
           '${AppRoutes.movieDetails}/${movie.movieId}',
-        );
+        ).then((_) {
+          _profileBloc.add(
+            const FetchUserProfile(
+              selectedTabIndex: 0,
+              verifyFreshness: true,
+            ),
+          );
+        });
       },
     );
   }
@@ -257,7 +269,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
       onMovieTap: (movie) {
         context.push(
           '${AppRoutes.movieDetails}/${movie.movieId}',
-        );
+        ).then((_) {
+          _profileBloc.add(
+            const FetchUserProfile(
+              selectedTabIndex: 1,
+              verifyFreshness: true,
+            ),
+          );
+        });
       },
     );
   }

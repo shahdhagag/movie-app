@@ -127,6 +127,7 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
       userProfile: finalPayload.userProfile,
       watchList: finalPayload.watchList,
       history: finalPayload.history,
+      selectedTabIndex: event.selectedTabIndex,
     ));
   }
 
