@@ -3,7 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:movie/config/routes/app_routes.dart';
 import 'package:movie/core/utils/app_assets.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
 import '../../../../core/utils/app_colors.dart';
 import '../../../../core/utils/app_styles.dart';
 import '../../../../core/utils/app_validators.dart';
@@ -53,17 +56,64 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: BlocListener<AuthBloc, AuthState>(
-        listener: (context, state) {
+        listener: (context, state) async{
           if (state is AuthSuccess) {
-            ScaffoldMessenger.of(
-              context,
-            ).showSnackBar(SnackBar(content: Text(state.message)));
-            context.go('/main');
-          } else if (state is AuthError) {
+            final prefs = await SharedPreferences.getInstance();
+          await prefs.setBool('is_logged_in', true);
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text(state.message),
-                backgroundColor: AppColors.red,
+                content: Row(
+                  children: [
+                    Icon(Icons.check_circle, color: Colors.white),
+                    SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        'Login successful!',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    ),
+                  ],
+                ),
+                backgroundColor: Colors.green[600],
+                behavior: SnackBarBehavior.floating,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                margin: EdgeInsets.all(16),
+                duration: Duration(seconds: 3),
+                elevation: 8,
+              ),
+            );
+
+            context.go('/main');
+          }
+          else if (state is AuthError) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Row(
+                  children: [
+                    const Icon(Icons.error_outline, color: Colors.white),
+                    SizedBox(width: 12.w),
+                    Expanded(
+                      child: Text(
+                        state.message,
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 16.sp,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                backgroundColor: Colors.red[600],
+                behavior: SnackBarBehavior.floating,
+                margin: EdgeInsets.symmetric(horizontal: 24.w, vertical: 16.h),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16.r),
+                ),
+                elevation: 8,
+                duration: const Duration(seconds: 3),
               ),
             );
           }
@@ -76,16 +126,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    SizedBox(height: 60.h),
-                    GestureDetector(
-                      onTap: () => context.pop(),
-                      child: Icon(
-                        Icons.arrow_back_ios_rounded,
-                        color: AppColors.primary,
-                        size: 24.sp,
-                      ),
-                    ),
-                    SizedBox(height: 40.h),
+                    SizedBox(height: 100.h),
 
                     Center(
                       child: Center(
@@ -98,7 +139,6 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     SizedBox(height: 80.h),
 
-
                     Form(
                       key: _formKey,
                       child: Column(
@@ -106,17 +146,30 @@ class _LoginScreenState extends State<LoginScreen> {
                           AuthTextField(
                             hintText: ' Email',
                             controller: _emailController,
-                            prefixIcon: Image.asset(AppAssets.emailIcon,width: 3.w,height: 25.h,),
+                            prefixIcon: Padding(
+                              padding: EdgeInsets.all(4),
+                              child: Image.asset(
+                                AppAssets.emailIcon,
+                                width: 3.w,
+                                height: 25.h,
+                              ),
+                            ),
                             keyboardType: TextInputType.emailAddress,
                             validator: AppValidators.validateEmail,
                           ),
                           SizedBox(height: 20.h),
 
                           AuthTextField(
-
                             hintText: ' Password',
                             controller: _passwordController,
-                            prefixIcon:Image.asset(AppAssets.passwordIcon,width: 3.w,height: 25.h),
+                            prefixIcon: Padding(
+                              padding: EdgeInsets.all(4),
+                              child: Image.asset(
+                                AppAssets.passwordIcon,
+                                width: 3.w,
+                                height: 25.h,
+                              ),
+                            ),
                             isPassword: true,
                             validator: AppValidators.validatePassword,
                           ),
@@ -125,7 +178,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           Align(
                             alignment: Alignment.centerRight,
                             child: GestureDetector(
-                              onTap: () => context.push('/forgot-password'),
+                              onTap: () => context.push(AppRoutes.forgotPassword),
                               child: Text(
                                 'Forgot Password ?',
                                 style: AppStyles.h5.copyWith(
@@ -136,33 +189,47 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                           ),
                           SizedBox(height: 30.h),
-
                           SizedBox(
                             width: double.infinity,
                             height: 50.h,
                             child: ElevatedButton(
-                              onPressed: state is AuthLoading
-                                  ? null
-                                  : _handleLogin,
+                              onPressed: state is LoginLoading ? null : _handleLogin,
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: AppColors.primary,
                                 disabledBackgroundColor: AppColors.textTertiary,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12.r),
+                                ),
                               ),
-                              child: state is AuthLoading
-                                  ? SizedBox(
-                                      height: 24.h,
-                                      width: 24.h,
-                                      child: const CircularProgressIndicator(
-                                        color: AppColors.primary,
-                                      ),
-                                    )
-                                  : Text(
-                                      'Login',
-                                      style: AppStyles.h5.copyWith(
-                                        fontSize: 16.sp,
-                                        color: AppColors.textSecondary,
-                                      ),
+                              child: state is LoginLoading
+                                  ? Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  SizedBox(
+                                    width: 24.w,
+                                    height: 24.h,
+                                    child: const CircularProgressIndicator(
+                                      color: Colors.white,
+                                      strokeWidth: 3,
                                     ),
+                                  ),
+                                  SizedBox(width: 12.w),
+                                  Text(
+                                    'Logging in...',
+                                    style: AppStyles.h5.copyWith(
+                                      fontSize: 16.sp,
+                                      color: AppColors.textSecondary,
+                                    ),
+                                  ),
+                                ],
+                              )
+                                  : Text(
+                                'Login',
+                                style: AppStyles.h5.copyWith(
+                                  fontSize: 16.sp,
+                                  color: AppColors.textSecondary,
+                                ),
+                              ),
                             ),
                           ),
                           SizedBox(height: 20.h),
@@ -185,7 +252,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                     ),
                                     recognizer: TapGestureRecognizer()
                                       ..onTap = () {
-                                        context.push('/register');
+                                        context.push(AppRoutes.register);
                                       },
                                   ),
                                 ],
@@ -214,7 +281,9 @@ class _LoginScreenState extends State<LoginScreen> {
                               ),
                               Expanded(
                                 child: Divider(
-                                  color: AppColors.textTertiary.withOpacity(0.3),
+                                  color: AppColors.textTertiary.withOpacity(
+                                    0.3,
+                                  ),
                                   thickness: 2,
                                 ),
                               ),
@@ -226,18 +295,18 @@ class _LoginScreenState extends State<LoginScreen> {
                             width: double.infinity,
                             height: 50.h,
                             child: ElevatedButton(
-                              onPressed: state is AuthLoading
+                              onPressed: state is GoogleLoading
                                   ? null
                                   : () {
                                       context.read<AuthBloc>().add(
-                                            const GoogleSignInEvent(),
-                                          );
+                                        const GoogleSignInEvent(),
+                                      );
                                     },
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: AppColors.primary,
                                 disabledBackgroundColor: AppColors.textTertiary,
                               ),
-                              child: state is AuthLoading
+                              child: state is GoogleLoading
                                   ? SizedBox(
                                       height: 24.h,
                                       width: 24.h,
@@ -246,7 +315,8 @@ class _LoginScreenState extends State<LoginScreen> {
                                       ),
                                     )
                                   : Row(
-                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
                                       children: [
                                         Text(
                                           'G',

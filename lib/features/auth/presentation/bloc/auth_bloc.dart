@@ -32,7 +32,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   }
 
   Future<void> _onLogin(LoginEvent event, Emitter<AuthState> emit) async {
-    emit(const AuthLoading());
+    emit(LoginLoading());
 
     final result = await loginUseCase(
       LoginParams(
@@ -42,8 +42,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     );
 
     result.fold(
-      (failure) => emit(AuthError(failure.message)),
-      (user) => emit(AuthSuccess(user: user, message: 'Login successful')),
+          (failure) => emit(AuthError(failure.message)),
+          (user) => emit(AuthSuccess(user: user, message: 'Login successful')),
     );
   }
 
@@ -99,8 +99,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     GoogleSignInEvent event,
     Emitter<AuthState> emit,
   ) async {
-    emit(const AuthLoading());
-
+    emit(GoogleLoading());
     final result = await googleSignInUseCase(google_sign_in.NoParams());
 
     result.fold(
