@@ -46,6 +46,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../api/dio_client.dart';
 
 final getIt = GetIt.instance;
+const String _googleWebClientId =
+    '370713648945-c5cfi1sa0j62clf5c0mjuq9bp3h95aae.apps.googleusercontent.com';
 
 Future<void> setupLocator() async {
   // Core - Dio Client
@@ -54,12 +56,17 @@ Future<void> setupLocator() async {
 
   // ==================== AUTH FEATURE ====================
 
-  // Firebase Auth instance
+  // Firebase instances
   getIt.registerLazySingleton<FirebaseAuth>(() => FirebaseAuth.instance);
+  getIt.registerLazySingleton<FirebaseFirestore>(() => FirebaseFirestore.instance);
 
   // Data Sources
   getIt.registerLazySingleton<AuthRemoteDataSource>(
-    () => AuthRemoteDataSourceImpl(firebaseAuth: getIt<FirebaseAuth>()),
+    () => AuthRemoteDataSourceImpl(
+      firebaseAuth: getIt<FirebaseAuth>(),
+      firestore: getIt<FirebaseFirestore>(),
+      googleWebClientId: _googleWebClientId,
+    ),
   );
 
   // Repositories
@@ -159,6 +166,7 @@ Future<void> setupLocator() async {
       getMovieSuggestions: getIt<GetMovieSuggestions>(),
     ),
   );
+
   // ==================== SEARCH FEATURE ====================
 
   // Data Sources
@@ -168,26 +176,26 @@ Future<void> setupLocator() async {
 
   // Repositories
   getIt.registerLazySingleton<SearchRepository>(
-    () =>
-        SearchRepositoryImpl(remoteDataSource: getIt<SearchRemoteDataSource>()),
+    () => SearchRepositoryImpl(
+      remoteDataSource: getIt<SearchRemoteDataSource>(),
+    ),
   );
 
   // UseCases
-  // UseCase
   getIt.registerLazySingleton<SearchMoviesUseCase>(
-    () => SearchMoviesUseCase(repository: getIt<SearchRepository>()),
+    () => SearchMoviesUseCase(
+      repository: getIt<SearchRepository>(),
+    ),
   );
+
   // Cubit
   getIt.registerFactory<SearchCubit>(
-    () => SearchCubit(searchMoviesUseCase: getIt<SearchMoviesUseCase>()),
+    () => SearchCubit(
+      searchMoviesUseCase: getIt<SearchMoviesUseCase>(),
+    ),
   );
 
   // ==================== PROFILE FEATURE ====================
-
-  // Firebase Firestore instance
-  getIt.registerLazySingleton<FirebaseFirestore>(
-    () => FirebaseFirestore.instance,
-  );
 
   // Data Sources
   getIt.registerLazySingleton<ProfileRemoteDataSource>(
@@ -199,9 +207,7 @@ Future<void> setupLocator() async {
 
   // Repositories
   getIt.registerLazySingleton<ProfileRepository>(
-    () => ProfileRepositoryImpl(
-      remoteDataSource: getIt<ProfileRemoteDataSource>(),
-    ),
+    () => ProfileRepositoryImpl(remoteDataSource: getIt<ProfileRemoteDataSource>()),
   );
 
   // Use Cases

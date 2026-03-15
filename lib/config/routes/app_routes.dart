@@ -1,6 +1,5 @@
 /// Route Names
 class AppRoutes {
-
   static const String splash = '/';
   static const String onboarding = '/onboarding';
 
@@ -30,4 +29,3 @@ class AppRoutes {
   static const String privacy = '/privacy';
   static const String terms = '/terms';
 }
-
