@@ -10,6 +10,8 @@ class MovieDetailsHeader extends StatelessWidget {
   final VoidCallback? onBackPressed;
   final VoidCallback? onBookmarkPressed;
   final VoidCallback? onPlayPressed;
+  final bool isBookmarked;
+  final bool isBookmarkLoading;
 
   const MovieDetailsHeader({
     super.key,
@@ -18,6 +20,8 @@ class MovieDetailsHeader extends StatelessWidget {
     this.onBackPressed,
     this.onBookmarkPressed,
     this.onPlayPressed,
+    this.isBookmarked = false,
+    this.isBookmarkLoading = false,
   });
 
   @override
@@ -85,12 +89,21 @@ class MovieDetailsHeader extends StatelessWidget {
             top: MediaQuery.of(context).padding.top + 8.h,
             right: 16.w,
             child: GestureDetector(
-              onTap: onBookmarkPressed,
-              child: Icon(
-                Icons.bookmark_border,
-                color: Colors.white,
-                size: 30.sp,
-              ),
+              onTap: isBookmarkLoading ? null : onBookmarkPressed,
+              child: isBookmarkLoading
+                  ? SizedBox(
+                      width: 26.sp,
+                      height: 26.sp,
+                      child: const CircularProgressIndicator(
+                        strokeWidth: 2,
+                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                      ),
+                    )
+                  : Icon(
+                      isBookmarked ? Icons.bookmark : Icons.bookmark_border,
+                      color: Colors.white,
+                      size: 30.sp,
+                    ),
             ),
           ),
 
@@ -125,4 +138,3 @@ class MovieDetailsHeader extends StatelessWidget {
     );
   }
 }
-

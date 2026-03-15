@@ -20,16 +20,13 @@ import '../../features/search/presentation/screen/search_screen.dart';
 import '../../features/splash/splash_screen.dart';
 import 'app_routes.dart';
 
-
 /// GoRouter Configuration
 class AppRouter {
-
   static final GoRouter router = GoRouter(
-     initialLocation: AppRoutes.splash,
-   // initialLocation: AppRoutes.main,
+    initialLocation: AppRoutes.splash,
+    // initialLocation: AppRoutes.main,
     debugLogDiagnostics: true,
     routes: [
-
       GoRoute(
         path: AppRoutes.splash,
         name: 'splash',
@@ -39,10 +36,8 @@ class AppRouter {
       GoRoute(
         path: AppRoutes.onboarding,
         name: 'onboarding',
-        builder: (context, state) => OnboardingScreen() ,
+        builder: (context, state) => OnboardingScreen(),
       ),
-
-
 
       GoRoute(
         path: AppRoutes.login,
@@ -69,8 +64,6 @@ class AppRouter {
         ),
       ),
 
-
-
       /// shahd part pls dont touch
       GoRoute(
         path: AppRoutes.main,
@@ -95,19 +88,44 @@ class AppRouter {
       GoRoute(
         path: AppRoutes.movieDetails,
         builder: (context, state) {
-          final movieId = state.extra as int;
+          final extra = state.extra;
+          final movieId = extra is int
+              ? extra
+              : int.tryParse(state.uri.queryParameters['id'] ?? '');
+
+          if (movieId == null || movieId <= 0) {
+            return Scaffold(
+              body: Center(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(
+                        Icons.error_outline,
+                        size: 60,
+                        color: Colors.red,
+                      ),
+                      const SizedBox(height: 12),
+                      const Text(
+                        'Unable to open this movie right now.',
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 16),
+                      ElevatedButton(
+                        onPressed: () => GoRouter.of(context).pop(),
+                        child: const Text('Go Back'),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          }
+
           return MovieDetailsScreen(movieId: movieId);
         },
       ),
-
-
-
-
-
-
-
-
-
 
       GoRoute(
         path: AppRoutes.moviesByGenre,
@@ -152,8 +170,6 @@ class AppRouter {
         builder: (context, state) => const ProfileScreen(),
       ),
 
-
-
       GoRoute(
         path: AppRoutes.editProfile,
         name: 'editProfile',
@@ -170,34 +186,40 @@ class AppRouter {
       GoRoute(
         path: AppRoutes.favorites,
         name: 'favorites',
-        builder: (context, state) => const Placeholder(), // TODO: Replace with FavoritesScreen
+        builder: (context, state) =>
+            const Placeholder(), // TODO: Replace with FavoritesScreen
       ),
       GoRoute(
         path: AppRoutes.watchlist,
         name: 'watchlist',
-        builder: (context, state) => const Placeholder(), // TODO: Replace with WatchlistScreen
+        builder: (context, state) =>
+            const Placeholder(), // TODO: Replace with WatchlistScreen
       ),
       GoRoute(
         path: AppRoutes.settings,
         name: 'settings',
-        builder: (context, state) => const Placeholder(), // TODO: Replace with SettingsScreen
+        builder: (context, state) =>
+            const Placeholder(), // TODO: Replace with SettingsScreen
       ),
 
       // ========== OTHER ROUTES ==========
       GoRoute(
         path: AppRoutes.about,
         name: 'about',
-        builder: (context, state) => const Placeholder(), // TODO: Replace with AboutScreen
+        builder: (context, state) =>
+            const Placeholder(), // TODO: Replace with AboutScreen
       ),
       GoRoute(
         path: AppRoutes.privacy,
         name: 'privacy',
-        builder: (context, state) => const Placeholder(), // TODO: Replace with PrivacyScreen
+        builder: (context, state) =>
+            const Placeholder(), // TODO: Replace with PrivacyScreen
       ),
       GoRoute(
         path: AppRoutes.terms,
         name: 'terms',
-        builder: (context, state) => const Placeholder(), // TODO: Replace with TermsScreen
+        builder: (context, state) =>
+            const Placeholder(), // TODO: Replace with TermsScreen
       ),
     ],
 
@@ -207,11 +229,7 @@ class AppRouter {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(
-              Icons.error_outline,
-              size: 80,
-              color: Colors.red,
-            ),
+            const Icon(Icons.error_outline, size: 80, color: Colors.red),
             const SizedBox(height: 16),
             Text(
               'Page not found!',
@@ -231,8 +249,6 @@ class AppRouter {
         ),
       ),
     ),
-
-
   );
 }
 
@@ -267,5 +283,3 @@ class AppRouter {
 //   }
 // }
 //
-
-

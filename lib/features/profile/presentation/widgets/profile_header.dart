@@ -77,7 +77,7 @@ class ProfileHeader extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                _buildStatItem(watchListCount.toString(), 'Wish List'),
+                _buildStatItem(watchListCount.toString(), 'Watch List'),
                 _buildStatItem(historyCount.toString(), 'History'),
               ],
             ),

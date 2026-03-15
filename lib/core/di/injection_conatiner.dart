@@ -35,6 +35,7 @@ import '../../features/profile/domain/usecases/get_watchlist.dart';
 import '../../features/profile/domain/usecases/get_history.dart';
 import '../../features/profile/domain/usecases/add_to_watchlist.dart';
 import '../../features/profile/domain/usecases/add_to_history.dart';
+import '../../features/profile/domain/usecases/remove_from_watchlist.dart';
 import '../../features/profile/domain/usecases/update_user_profile.dart';
 import '../../features/profile/domain/usecases/is_movie_in_watchlist.dart';
 import '../../features/profile/domain/usecases/is_movie_in_history.dart';
@@ -160,36 +161,33 @@ Future<void> setupLocator() async {
   );
   // ==================== SEARCH FEATURE ====================
 
-// Data Sources
+  // Data Sources
   getIt.registerLazySingleton<SearchRemoteDataSource>(
-        () => SearchRemoteDataSourceImpl(dio: getIt()),
+    () => SearchRemoteDataSourceImpl(dio: getIt()),
   );
 
-// Repositories
+  // Repositories
   getIt.registerLazySingleton<SearchRepository>(
-        () => SearchRepositoryImpl(
-      remoteDataSource: getIt<SearchRemoteDataSource>(),
-    ),
+    () =>
+        SearchRepositoryImpl(remoteDataSource: getIt<SearchRemoteDataSource>()),
   );
 
-// UseCases
-// UseCase
+  // UseCases
+  // UseCase
   getIt.registerLazySingleton<SearchMoviesUseCase>(
-        () => SearchMoviesUseCase(
-      repository: getIt<SearchRepository>(),
-    ),
+    () => SearchMoviesUseCase(repository: getIt<SearchRepository>()),
   );
-// Cubit
+  // Cubit
   getIt.registerFactory<SearchCubit>(
-        () => SearchCubit(
-      searchMoviesUseCase: getIt<SearchMoviesUseCase>(),
-    ),
+    () => SearchCubit(searchMoviesUseCase: getIt<SearchMoviesUseCase>()),
   );
 
   // ==================== PROFILE FEATURE ====================
 
   // Firebase Firestore instance
-  getIt.registerLazySingleton<FirebaseFirestore>(() => FirebaseFirestore.instance);
+  getIt.registerLazySingleton<FirebaseFirestore>(
+    () => FirebaseFirestore.instance,
+  );
 
   // Data Sources
   getIt.registerLazySingleton<ProfileRemoteDataSource>(
@@ -201,7 +199,9 @@ Future<void> setupLocator() async {
 
   // Repositories
   getIt.registerLazySingleton<ProfileRepository>(
-    () => ProfileRepositoryImpl(remoteDataSource: getIt<ProfileRemoteDataSource>()),
+    () => ProfileRepositoryImpl(
+      remoteDataSource: getIt<ProfileRemoteDataSource>(),
+    ),
   );
 
   // Use Cases
@@ -214,7 +214,7 @@ Future<void> setupLocator() async {
   getIt.registerLazySingleton<GetHistoryUseCase>(
     () => GetHistoryUseCase(getIt<ProfileRepository>()),
   );
-  
+
   // Helper Use Cases
   getIt.registerLazySingleton<IsMovieInWatchListUseCase>(
     () => IsMovieInWatchListUseCase(getIt<ProfileRepository>()),
@@ -233,6 +233,9 @@ Future<void> setupLocator() async {
   // New Profile Use Cases
   getIt.registerLazySingleton<AddToWatchListUseCase>(
     () => AddToWatchListUseCase(getIt<ProfileRepository>()),
+  );
+  getIt.registerLazySingleton<RemoveFromWatchListUseCase>(
+    () => RemoveFromWatchListUseCase(getIt<ProfileRepository>()),
   );
   getIt.registerLazySingleton<AddToHistoryUseCase>(
     () => AddToHistoryUseCase(getIt<ProfileRepository>()),

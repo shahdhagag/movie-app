@@ -193,7 +193,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         icon: Icons.list,
                         isSelected: state.selectedTabIndex == 0,
                         onTap: () {
-                          context.read<ProfileBloc>().add(const SwitchTabEvent(0));
+                          context.read<ProfileBloc>().add(
+                            const FetchUserProfile(
+                              selectedTabIndex: 0,
+                              verifyFreshness: true,
+                            ),
+                          );
                         },
                       ),
                       TabIndicator(
@@ -227,11 +232,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             );
           }
 
-          return const Scaffold(
-            body: Center(
-              child: EmptyStateWidget(),
-            ),
-          );
+          return const Scaffold(body: Center(child: EmptyStateWidget()));
         },
       ),
     );
@@ -245,14 +246,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return MovieGridWidget(
       movies: state.watchList,
       onMovieTap: (movie) {
-        context.push(
-          '${AppRoutes.movieDetails}/${movie.movieId}',
-        ).then((_) {
+        context.push(AppRoutes.movieDetails, extra: movie.movieId).then((_) {
           _profileBloc.add(
-            const FetchUserProfile(
-              selectedTabIndex: 0,
-              verifyFreshness: true,
-            ),
+            const FetchUserProfile(selectedTabIndex: 0, verifyFreshness: true),
           );
         });
       },
@@ -267,14 +263,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return MovieGridWidget(
       movies: state.history,
       onMovieTap: (movie) {
-        context.push(
-          '${AppRoutes.movieDetails}/${movie.movieId}',
-        ).then((_) {
+        context.push(AppRoutes.movieDetails, extra: movie.movieId).then((_) {
           _profileBloc.add(
-            const FetchUserProfile(
-              selectedTabIndex: 1,
-              verifyFreshness: true,
-            ),
+            const FetchUserProfile(selectedTabIndex: 1, verifyFreshness: true),
           );
         });
       },
@@ -287,11 +278,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
       builder: (BuildContext dialogContext) {
         return AlertDialog(
           backgroundColor: AppColors.grey,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.r)),
-          title: Text(
-            'Logout',
-            style: AppStyles.h3,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16.r),
           ),
+          title: Text('Logout', style: AppStyles.h3),
           content: Text(
             'Are you sure you want to logout?',
             style: AppStyles.h5.copyWith(color: AppColors.textTertiary),

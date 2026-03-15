@@ -3,6 +3,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
 import '../../../profile/domain/usecases/add_to_history.dart';
+import '../../../profile/domain/usecases/add_to_watchlist.dart';
+import '../../../profile/domain/usecases/is_movie_in_watchlist.dart';
+import '../../../profile/domain/usecases/remove_from_watchlist.dart';
 import '../../../../core/di/injection_conatiner.dart';
 import '../../../../core/utils/app_colors.dart';
 import '../bloc/movie_details_bloc.dart';
@@ -17,14 +20,12 @@ import '../widgets/screenshots_section.dart';
 import '../widgets/similar_movies_section.dart';
 import '../widgets/summary_section.dart';
 import '../widgets/watch_button.dart';
+import '../widgets/watchlist_feedback_snackbar.dart';
 
 class MovieDetailsScreen extends StatefulWidget {
   final int movieId;
 
-  const MovieDetailsScreen({
-    super.key,
-    required this.movieId,
-  });
+  const MovieDetailsScreen({super.key, required this.movieId});
 
   @override
   State<MovieDetailsScreen> createState() => _MovieDetailsScreenState();
@@ -32,6 +33,8 @@ class MovieDetailsScreen extends StatefulWidget {
 
 class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
   bool _historySaved = false;
+  bool _isInWatchList = false;
+  bool _isBookmarkLoading = false;
 
   Future<void> _saveToHistory(MovieDetailsLoaded state) async {
     if (_historySaved) {
@@ -39,7 +42,11 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
     }
 
     final movie = state.movieDetails;
-    final posterPath = movie.largeCoverImage ?? movie.mediumCoverImage ?? movie.smallCoverImage ?? '';
+    final posterPath =
+        movie.largeCoverImage ??
+        movie.mediumCoverImage ??
+        movie.smallCoverImage ??
+        '';
 
     final result = await getIt<AddToHistoryUseCase>()(
       AddToHistoryParams(
@@ -68,17 +75,105 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
     );
   }
 
+  Future<void> _loadWatchListStatus(int movieId) async {
+    final result = await getIt<IsMovieInWatchListUseCase>()(movieId: movieId);
+
+    if (!mounted) {
+      return;
+    }
+
+    result.fold(
+      (failure) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(failure.message),
+            backgroundColor: AppColors.red,
+          ),
+        );
+      },
+      (exists) {
+        setState(() {
+          _isInWatchList = exists;
+        });
+      },
+    );
+  }
+
+  Future<void> _toggleWatchList(MovieDetailsLoaded state) async {
+    if (_isBookmarkLoading) {
+      return;
+    }
+
+    setState(() {
+      _isBookmarkLoading = true;
+    });
+
+    final movie = state.movieDetails;
+    final posterPath =
+        movie.largeCoverImage ??
+        movie.mediumCoverImage ??
+        movie.smallCoverImage ??
+        '';
+
+    final result = _isInWatchList
+        ? await getIt<RemoveFromWatchListUseCase>()(
+            RemoveFromWatchListParams(movieId: movie.id),
+          )
+        : await getIt<AddToWatchListUseCase>()(
+            AddToWatchListParams(
+              movieId: movie.id,
+              title: movie.title,
+              posterPath: posterPath,
+            ),
+          );
+
+    if (!mounted) {
+      return;
+    }
+
+    result.fold(
+      (failure) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(failure.message),
+            backgroundColor: AppColors.red,
+          ),
+        );
+      },
+      (_) {
+        final isAdded = !_isInWatchList;
+        setState(() {
+          _isInWatchList = isAdded;
+        });
+        showWatchListFeedbackSnackBar(context, isAdded: isAdded);
+      },
+    );
+
+    if (!mounted) {
+      return;
+    }
+
+    setState(() {
+      _isBookmarkLoading = false;
+    });
+
+    // Refetch once to guarantee UI and backend are fully in sync.
+    await _loadWatchListStatus(movie.id);
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => getIt<MovieDetailsBloc>()
-        ..add(LoadMovieDetails(movieId: widget.movieId)),
+      create: (context) =>
+          getIt<MovieDetailsBloc>()
+            ..add(LoadMovieDetails(movieId: widget.movieId)),
       child: Scaffold(
         backgroundColor: AppColors.background,
         body: BlocConsumer<MovieDetailsBloc, MovieDetailsState>(
           listener: (context, state) {
             if (state is MovieDetailsLoaded) {
               _saveToHistory(state);
+              _loadWatchListStatus(state.movieDetails.id);
             }
           },
           builder: (context, state) {
@@ -93,8 +188,12 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(Icons.error_outline, color: AppColors.red, size: 60.sp),
-                    Gap( 16.h),
+                    Icon(
+                      Icons.error_outline,
+                      color: AppColors.red,
+                      size: 60.sp,
+                    ),
+                    Gap(16.h),
                     Padding(
                       padding: EdgeInsets.symmetric(horizontal: 32.w),
                       child: Text(
@@ -106,12 +205,12 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
                         ),
                       ),
                     ),
-                    Gap( 16.h),
+                    Gap(16.h),
                     ElevatedButton(
                       onPressed: () {
-                        context
-                            .read<MovieDetailsBloc>()
-                            .add(LoadMovieDetails(movieId: widget.movieId));
+                        context.read<MovieDetailsBloc>().add(
+                          LoadMovieDetails(movieId: widget.movieId),
+                        );
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.primary,
@@ -136,10 +235,16 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
                       children: [
                         // Background image (header)
                         MovieDetailsHeader(
-                          backgroundImage: movie.backgroundImageOriginal ??
+                          backgroundImage:
+                              movie.backgroundImageOriginal ??
                               movie.backgroundImage ??
                               movie.largeCoverImage,
                           ytTrailerCode: movie.ytTrailerCode,
+                          isBookmarked: _isInWatchList,
+                          isBookmarkLoading: _isBookmarkLoading,
+                          onBookmarkPressed: () {
+                            _toggleWatchList(state);
+                          },
                           onPlayPressed: () {
                             // TODO: Open trailer
                           },
@@ -167,7 +272,6 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
                         ),
 
                         // Movie info (title, year, runtime) positioned
-
                         Positioned(
                           bottom: 16.h,
                           left: 16.w,
@@ -181,8 +285,7 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
                       ],
                     ),
 
-                    Gap( 16.h),
-
+                    Gap(16.h),
 
                     WatchButton(
                       onPressed: () {
@@ -192,45 +295,46 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
 
                     Gap(16.h),
 
-
-
                     MovieStatsRow(
                       likeCount: movie.likeCount,
                       runtime: movie.runtime,
                       rating: movie.rating,
                     ),
 
-                    Gap( 24.h),
+                    Gap(24.h),
 
                     ScreenShotsSection(
-                      screenshot1: movie.largeScreenshotImage1 ??
+                      screenshot1:
+                          movie.largeScreenshotImage1 ??
                           movie.mediumScreenshotImage1,
-                      screenshot2: movie.largeScreenshotImage2 ??
+                      screenshot2:
+                          movie.largeScreenshotImage2 ??
                           movie.mediumScreenshotImage2,
-                      screenshot3: movie.largeScreenshotImage3 ??
+                      screenshot3:
+                          movie.largeScreenshotImage3 ??
                           movie.mediumScreenshotImage3,
                     ),
 
-                    Gap( 24.h),
+                    Gap(24.h),
 
                     SimilarMoviesSection(suggestions: suggestions),
 
-                    Gap( 24.h),
+                    Gap(24.h),
 
                     SummarySection(
                       summary: movie.summary,
                       descriptionFull: movie.descriptionFull,
                     ),
 
-                    Gap( 24.h),
+                    Gap(24.h),
 
                     CastSection(cast: movie.cast),
 
-                    Gap( 24.h),
+                    Gap(24.h),
 
                     GenresSection(genres: movie.genres),
 
-                    Gap( 40.h),
+                    Gap(40.h),
                   ],
                 ),
               );
