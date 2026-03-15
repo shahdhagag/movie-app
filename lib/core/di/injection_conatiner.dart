@@ -6,7 +6,7 @@ import '../../features/auth/domain/repositories/auth_repository.dart';
 import '../../features/auth/domain/usecases/forgot_password_usecase.dart';
 import '../../features/auth/domain/usecases/google_sign_in_usecase.dart';
 import '../../features/auth/domain/usecases/login_usecase.dart';
-import '../../features/auth/domain/usecases/logout_usecase.dart';
+import '../../features/auth/domain/usecases/logout_usecase.dart' as auth_logout;
 import '../../features/auth/domain/usecases/register_usecase.dart';
 import '../../features/auth/presentation/bloc/auth_bloc.dart';
 import '../../features/browse/presentation/cubit/browse_cubit.dart';
@@ -27,6 +27,22 @@ import '../../features/search/data/reposatories/search_repository_impl.dart';
 import '../../features/search/domain/repositories/search_repo.dart';
 import '../../features/search/domain/usecases/search_movies_usecase.dart';
 import '../../features/search/presentation/cubit/search_cubit.dart';
+import '../../features/profile/data/datasources/profile_remote_data_source.dart';
+import '../../features/profile/data/repositories/profile_repository_impl.dart';
+import '../../features/profile/domain/repositories/profile_repository.dart';
+import '../../features/profile/domain/usecases/get_user_profile.dart';
+import '../../features/profile/domain/usecases/get_watchlist.dart';
+import '../../features/profile/domain/usecases/get_history.dart';
+import '../../features/profile/domain/usecases/add_to_watchlist.dart';
+import '../../features/profile/domain/usecases/add_to_history.dart';
+import '../../features/profile/domain/usecases/remove_from_watchlist.dart';
+import '../../features/profile/domain/usecases/update_user_profile.dart';
+import '../../features/profile/domain/usecases/is_movie_in_watchlist.dart';
+import '../../features/profile/domain/usecases/is_movie_in_history.dart';
+import '../../features/profile/domain/usecases/logout.dart' as profile_logout;
+import '../../features/profile/domain/usecases/delete_account.dart';
+import '../../features/profile/presentation/bloc/profile_bloc.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import '../api/dio_client.dart';
 
 final getIt = GetIt.instance;
@@ -58,8 +74,8 @@ Future<void> setupLocator() async {
   getIt.registerLazySingleton<RegisterUseCase>(
     () => RegisterUseCase(getIt<AuthRepository>()),
   );
-  getIt.registerLazySingleton<LogoutUseCase>(
-    () => LogoutUseCase(getIt<AuthRepository>()),
+  getIt.registerLazySingleton<auth_logout.LogoutUseCase>(
+    () => auth_logout.LogoutUseCase(getIt<AuthRepository>()),
   );
   getIt.registerLazySingleton<ForgotPasswordUseCase>(
     () => ForgotPasswordUseCase(getIt<AuthRepository>()),
@@ -73,7 +89,7 @@ Future<void> setupLocator() async {
     () => AuthBloc(
       loginUseCase: getIt<LoginUseCase>(),
       registerUseCase: getIt<RegisterUseCase>(),
-      logoutUseCase: getIt<LogoutUseCase>(),
+      logoutUseCase: getIt<auth_logout.LogoutUseCase>(),
       forgotPasswordUseCase: getIt<ForgotPasswordUseCase>(),
       googleSignInUseCase: getIt<GoogleSignInUseCase>(),
     ),
@@ -145,29 +161,100 @@ Future<void> setupLocator() async {
   );
   // ==================== SEARCH FEATURE ====================
 
-// Data Sources
+  // Data Sources
   getIt.registerLazySingleton<SearchRemoteDataSource>(
-        () => SearchRemoteDataSourceImpl(dio: getIt()),
+    () => SearchRemoteDataSourceImpl(dio: getIt()),
   );
 
-// Repositories
+  // Repositories
   getIt.registerLazySingleton<SearchRepository>(
-        () => SearchRepositoryImpl(
-      remoteDataSource: getIt<SearchRemoteDataSource>(),
+    () =>
+        SearchRepositoryImpl(remoteDataSource: getIt<SearchRemoteDataSource>()),
+  );
+
+  // UseCases
+  // UseCase
+  getIt.registerLazySingleton<SearchMoviesUseCase>(
+    () => SearchMoviesUseCase(repository: getIt<SearchRepository>()),
+  );
+  // Cubit
+  getIt.registerFactory<SearchCubit>(
+    () => SearchCubit(searchMoviesUseCase: getIt<SearchMoviesUseCase>()),
+  );
+
+  // ==================== PROFILE FEATURE ====================
+
+  // Firebase Firestore instance
+  getIt.registerLazySingleton<FirebaseFirestore>(
+    () => FirebaseFirestore.instance,
+  );
+
+  // Data Sources
+  getIt.registerLazySingleton<ProfileRemoteDataSource>(
+    () => ProfileRemoteDataSourceImpl(
+      firestore: getIt<FirebaseFirestore>(),
+      firebaseAuth: getIt<FirebaseAuth>(),
     ),
   );
 
-// UseCases
-// UseCase
-  getIt.registerLazySingleton<SearchMoviesUseCase>(
-        () => SearchMoviesUseCase(
-      repository: getIt<SearchRepository>(),
+  // Repositories
+  getIt.registerLazySingleton<ProfileRepository>(
+    () => ProfileRepositoryImpl(
+      remoteDataSource: getIt<ProfileRemoteDataSource>(),
     ),
   );
-// Cubit
-  getIt.registerFactory<SearchCubit>(
-        () => SearchCubit(
-      searchMoviesUseCase: getIt<SearchMoviesUseCase>(),
+
+  // Use Cases
+  getIt.registerLazySingleton<GetUserProfileUseCase>(
+    () => GetUserProfileUseCase(getIt<ProfileRepository>()),
+  );
+  getIt.registerLazySingleton<GetWatchListUseCase>(
+    () => GetWatchListUseCase(getIt<ProfileRepository>()),
+  );
+  getIt.registerLazySingleton<GetHistoryUseCase>(
+    () => GetHistoryUseCase(getIt<ProfileRepository>()),
+  );
+
+  // Helper Use Cases
+  getIt.registerLazySingleton<IsMovieInWatchListUseCase>(
+    () => IsMovieInWatchListUseCase(getIt<ProfileRepository>()),
+  );
+  getIt.registerLazySingleton<IsMovieInHistoryUseCase>(
+    () => IsMovieInHistoryUseCase(getIt<ProfileRepository>()),
+  );
+
+  getIt.registerLazySingleton<profile_logout.LogoutUseCase>(
+    () => profile_logout.LogoutUseCase(getIt<ProfileRepository>()),
+  );
+  getIt.registerLazySingleton<DeleteAccountUseCase>(
+    () => DeleteAccountUseCase(getIt<ProfileRepository>()),
+  );
+
+  // New Profile Use Cases
+  getIt.registerLazySingleton<AddToWatchListUseCase>(
+    () => AddToWatchListUseCase(getIt<ProfileRepository>()),
+  );
+  getIt.registerLazySingleton<RemoveFromWatchListUseCase>(
+    () => RemoveFromWatchListUseCase(getIt<ProfileRepository>()),
+  );
+  getIt.registerLazySingleton<AddToHistoryUseCase>(
+    () => AddToHistoryUseCase(getIt<ProfileRepository>()),
+  );
+  getIt.registerLazySingleton<UpdateUserProfileUseCase>(
+    () => UpdateUserProfileUseCase(getIt<ProfileRepository>()),
+  );
+
+  // BLoCs
+  getIt.registerFactory<ProfileBloc>(
+    () => ProfileBloc(
+      getUserProfileUseCase: getIt<GetUserProfileUseCase>(),
+      getWatchListUseCase: getIt<GetWatchListUseCase>(),
+      getHistoryUseCase: getIt<GetHistoryUseCase>(),
+      logoutUseCase: getIt<profile_logout.LogoutUseCase>(),
+      deleteAccountUseCase: getIt<DeleteAccountUseCase>(),
+      addToWatchListUseCase: getIt<AddToWatchListUseCase>(),
+      addToHistoryUseCase: getIt<AddToHistoryUseCase>(),
+      updateUserProfileUseCase: getIt<UpdateUserProfileUseCase>(),
     ),
   );
 }

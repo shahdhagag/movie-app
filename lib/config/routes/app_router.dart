@@ -13,21 +13,20 @@ import '../../features/home/domain/entities/movie.dart';
 import '../../features/home/presentation/screens/genre_movies_screen.dart';
 import '../../features/home/presentation/screens/main_screen.dart';
 import '../../features/movie_details/presentation/screens/movie_details_screen.dart';
+import '../../features/profile/presentation/bloc/profile_bloc.dart';
+import '../../features/profile/presentation/screens/edit_profile_screen.dart';
 import '../../features/profile/presentation/screens/profile_screen.dart';
 import '../../features/search/presentation/screen/search_screen.dart';
 import '../../features/splash/splash_screen.dart';
 import 'app_routes.dart';
 
-
 /// GoRouter Configuration
 class AppRouter {
-
   static final GoRouter router = GoRouter(
-     initialLocation: AppRoutes.splash,
-   // initialLocation: AppRoutes.main,
+    initialLocation: AppRoutes.splash,
+    // initialLocation: AppRoutes.main,
     debugLogDiagnostics: true,
     routes: [
-
       GoRoute(
         path: AppRoutes.splash,
         name: 'splash',
@@ -37,10 +36,8 @@ class AppRouter {
       GoRoute(
         path: AppRoutes.onboarding,
         name: 'onboarding',
-        builder: (context, state) => OnboardingScreen() ,
+        builder: (context, state) => OnboardingScreen(),
       ),
-
-
 
       GoRoute(
         path: AppRoutes.login,
@@ -67,6 +64,7 @@ class AppRouter {
         ),
       ),
 
+      /// shahd part pls dont touch
 
 
       GoRoute(
@@ -92,11 +90,70 @@ class AppRouter {
       GoRoute(
         path: AppRoutes.movieDetails,
         builder: (context, state) {
-          final movieId = state.extra as int;
+          final extra = state.extra;
+          final movieId = extra is int
+              ? extra
+              : int.tryParse(state.uri.queryParameters['id'] ?? '');
+
+          if (movieId == null || movieId <= 0) {
+            return Scaffold(
+              body: Center(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(
+                        Icons.error_outline,
+                        size: 60,
+                        color: Colors.red,
+                      ),
+                      const SizedBox(height: 12),
+                      const Text(
+                        'Unable to open this movie right now.',
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 16),
+                      ElevatedButton(
+                        onPressed: () => GoRouter.of(context).pop(),
+                        child: const Text('Go Back'),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          }
+
           return MovieDetailsScreen(movieId: movieId);
         },
       ),
 
+      GoRoute(
+        path: AppRoutes.moviesByGenre,
+        name: 'moviesByGenre',
+        builder: (context, state) {
+          final genreId = state.uri.queryParameters['genreId'];
+          final genreName = state.uri.queryParameters['genreName'];
+          return Placeholder(); // TODO: Replace with MoviesByGenreScreen
+        },
+      ),
+      GoRoute(
+        path: AppRoutes.moviesByCategory,
+        name: 'moviesByCategory',
+        builder: (context, state) {
+          final category = state.uri.queryParameters['category'];
+          return Placeholder(); // TODO: Replace with MoviesByCategoryScreen
+        },
+      ),
+      GoRoute(
+        path: '${AppRoutes.watchMovie}/:id',
+        name: 'watchMovie',
+        builder: (context, state) {
+          final movieId = state.pathParameters['id']!;
+          return Placeholder(); // TODO: Replace with WatchMovieScreen
+        },
+      ),
 
 
 
@@ -124,12 +181,13 @@ class AppRouter {
         builder: (context, state) => const ProfileScreen(),
       ),
 
-
-
       GoRoute(
         path: AppRoutes.editProfile,
         name: 'editProfile',
-        builder: (context, state) => const Placeholder(),
+        builder: (context, state) => BlocProvider<ProfileBloc>.value(
+          value: getIt<ProfileBloc>(),
+          child: const EditProfileScreen(),
+        ),
       ),
       GoRoute(
         path: AppRoutes.updateProfile,
@@ -139,17 +197,20 @@ class AppRouter {
       GoRoute(
         path: AppRoutes.favorites,
         name: 'favorites',
-        builder: (context, state) => const Placeholder(), // TODO: Replace with FavoritesScreen
+        builder: (context, state) =>
+            const Placeholder(), // TODO: Replace with FavoritesScreen
       ),
       GoRoute(
         path: AppRoutes.watchlist,
         name: 'watchlist',
-        builder: (context, state) => const Placeholder(), // TODO: Replace with WatchlistScreen
+        builder: (context, state) =>
+            const Placeholder(), // TODO: Replace with WatchlistScreen
       ),
       GoRoute(
         path: AppRoutes.settings,
         name: 'settings',
-        builder: (context, state) => const Placeholder(), // TODO: Replace with SettingsScreen
+        builder: (context, state) =>
+            const Placeholder(), // TODO: Replace with SettingsScreen
       ),
 
 
