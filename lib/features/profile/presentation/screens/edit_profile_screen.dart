@@ -135,6 +135,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final blocState = context.watch<ProfileBloc>().state;
+    final isDeleting = blocState is ActionLoading && blocState.action == 'Deleting account';
+
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
@@ -156,9 +159,12 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(content: Text('Profile updated successfully')),
             );
-            _profileBloc.add(const FetchUserProfile());
-            context.go(AppRoutes.main);
+            context.go(AppRoutes.profile);
           } else if (state is ActionError && state.action == 'update_profile') {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(state.message), backgroundColor: AppColors.red),
+            );
+          } else if (state is ActionError && state.action == 'delete_account') {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(content: Text(state.message), backgroundColor: AppColors.red),
             );
@@ -222,14 +228,29 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   width: double.infinity,
                   height: 60.h,
                   child: ElevatedButton(
-                    onPressed: () {
+                    onPressed: isDeleting ? null : () {
                        _showDeleteAccountConfirmation(context);
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.red,
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15.r)),
                     ),
-                    child: Text('Delete Account', style: AppStyles.h4.copyWith(color: AppColors.textPrimary, fontWeight: FontWeight.bold)),
+                    child: isDeleting
+                        ? SizedBox(
+                            width: 24.w,
+                            height: 24.w,
+                            child: const CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: AppColors.textPrimary,
+                            ),
+                          )
+                        : Text(
+                            'Delete Account',
+                            style: AppStyles.h4.copyWith(
+                              color: AppColors.textPrimary,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                   ),
                 ),
                 Gap(16.h),
@@ -281,7 +302,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             TextButton(
               onPressed: () {
                 Navigator.pop(dialogContext);
-                _profileBloc.add(const DeleteAccountEvent());
+                if (_profileBloc.state is! ActionLoading) {
+                  _profileBloc.add(const DeleteAccountEvent());
+                }
               },
               child: Text(
                 'Delete',

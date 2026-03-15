@@ -9,7 +9,12 @@ abstract class ProfileEvent extends Equatable {
 
 // Data Loading Events
 class FetchUserProfile extends ProfileEvent {
-  const FetchUserProfile();
+  final bool verifyFreshness;
+
+  const FetchUserProfile({this.verifyFreshness = true});
+
+  @override
+  List<Object?> get props => [verifyFreshness];
 }
 
 class FetchWatchList extends ProfileEvent {

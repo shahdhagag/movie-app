@@ -55,6 +55,27 @@ class ProfileRemoteDataSourceImpl implements ProfileRemoteDataSource {
 
   String get _userId => _firebaseAuth.currentUser?.uid ?? '';
 
+  Future<void> _deleteUserCollection({required String collectionPath}) async {
+    const int batchSize = 400;
+
+    while (true) {
+      final snapshot = await _firestore
+          .collection(collectionPath)
+          .limit(batchSize)
+          .get();
+
+      if (snapshot.docs.isEmpty) {
+        break;
+      }
+
+      final batch = _firestore.batch();
+      for (final doc in snapshot.docs) {
+        batch.delete(doc.reference);
+      }
+      await batch.commit();
+    }
+  }
+
   @override
   Future<UserProfileModel> getUserProfile() async {
     try {
@@ -62,7 +83,10 @@ class ProfileRemoteDataSourceImpl implements ProfileRemoteDataSource {
         throw AuthException('User not authenticated');
       }
 
-      final doc = await _firestore.collection('users').doc(_userId).get();
+      final doc = await _firestore
+          .collection('users')
+          .doc(_userId)
+          .get(const GetOptions(source: Source.server));
 
       final data = doc.data() ?? {};
       
@@ -170,7 +194,7 @@ class ProfileRemoteDataSourceImpl implements ProfileRemoteDataSource {
           .doc(_userId)
           .collection('watchlist')
           .orderBy('addedAt', descending: true)
-          .get();
+          .get(const GetOptions(source: Source.server));
 
       return snapshot.docs
           .map((doc) => MovieItemModel.fromJson(doc.data()))
@@ -194,7 +218,7 @@ class ProfileRemoteDataSourceImpl implements ProfileRemoteDataSource {
           .doc(_userId)
           .collection('history')
           .orderBy('addedAt', descending: true)
-          .get();
+          .get(const GetOptions(source: Source.server));
 
       return snapshot.docs
           .map((doc) => MovieItemModel.fromJson(doc.data()))
@@ -370,17 +394,28 @@ class ProfileRemoteDataSourceImpl implements ProfileRemoteDataSource {
   @override
   Future<void> deleteAccount() async {
     try {
-      if (_userId.isEmpty) {
+      final user = _firebaseAuth.currentUser;
+      if (user == null || _userId.isEmpty) {
         throw AuthException('User not authenticated');
       }
 
-      // Delete user data from Firestore
+      // Firestore does not cascade-delete subcollections, so clear known data first.
+      await _deleteUserCollection(collectionPath: 'users/$_userId/watchlist');
+      await _deleteUserCollection(collectionPath: 'users/$_userId/history');
       await _firestore.collection('users').doc(_userId).delete();
 
-      // Delete user from Firebase Auth
-      await _firebaseAuth.currentUser?.delete();
+      await user.delete();
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'requires-recent-login') {
+        throw AuthException('For security reasons, please sign in again then try deleting your account.');
+      }
+      throw AuthException('Failed to delete account: ${e.message ?? 'Unknown authentication error'}');
     } on FirebaseException catch (e) {
-      throw ServerException(message: 'Failed to delete account: ${e.message}');
+      throw ServerException(message: 'Failed to delete account data: ${e.message}');
+    } on AuthException {
+      rethrow;
+    } on ServerException {
+      rethrow;
     } catch (e) {
       throw ServerException(message: 'Error deleting account: ${e.toString()}');
     }

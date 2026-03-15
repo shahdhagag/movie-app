@@ -37,6 +37,7 @@ class OnboardingScreen extends StatelessWidget {
     ),
     OnboardingEntity(
       image: AppAssets.onboarding5,
+
       title: "Rate, Review, and Learn",
       description:
           "Share your thoughts on the movies you've watched. Dive deep into film details and help others discover great movies with your reviews.",
@@ -86,7 +87,7 @@ class OnboardingScreen extends StatelessWidget {
                   isLast: state.isLast(pages.length),
                   onNext: () {
                     if (state.isLast(pages.length)) {
-                      context.go('/register');
+                      context.go('/login');
                     } else {
                       controller.nextPage(
                         duration: const Duration(milliseconds: 300),

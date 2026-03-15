@@ -15,12 +15,13 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> {
   int _currentIndex = 0;
+  int _profileRefreshVersion = 0;
 
-  final List<Widget> _pages = const [
-    HomeScreen(),
-    SearchScreen(),
-    BrowseScreen(),
-    ProfileScreen(),
+  List<Widget> get _pages => [
+    const HomeScreen(),
+    const SearchScreen(),
+    const BrowseScreen(),
+    ProfileScreen(key: ValueKey('profile_$_profileRefreshVersion')),
   ];
 
   @override
@@ -41,7 +42,12 @@ class _MainScreenState extends State<MainScreen> {
             child: CustomBottomNavBar(
               currentIndex: _currentIndex,
               onTap: (index) {
-                setState(() => _currentIndex = index);
+                setState(() {
+                  if (index == 3) {
+                    _profileRefreshVersion++;
+                  }
+                  _currentIndex = index;
+                });
               },
             ),
           ),

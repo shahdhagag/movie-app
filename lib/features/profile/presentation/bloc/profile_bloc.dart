@@ -7,9 +7,40 @@ import '../../domain/usecases/add_to_history.dart';
 import '../../domain/usecases/logout.dart';
 import '../../domain/usecases/delete_account.dart';
 import '../../domain/usecases/update_user_profile.dart';
+import '../../domain/entities/movie_item.dart';
+import '../../domain/entities/user_profile.dart';
 import '../../../../core/usecases/usecase.dart';
 import '../bloc/profile_event.dart';
 import '../bloc/profile_state.dart';
+
+class _ProfileFetchPayload {
+  final UserProfile userProfile;
+  final List<MovieItem> watchList;
+  final List<MovieItem> history;
+
+  _ProfileFetchPayload({
+    required this.userProfile,
+    required this.watchList,
+    required this.history,
+  });
+}
+
+class _ProfileFetchResult {
+  final _ProfileFetchPayload? payload;
+  final String? failureMessage;
+
+  const _ProfileFetchResult._({this.payload, this.failureMessage});
+
+  bool get isSuccess => payload != null;
+
+  factory _ProfileFetchResult.success(_ProfileFetchPayload payload) {
+    return _ProfileFetchResult._(payload: payload);
+  }
+
+  factory _ProfileFetchResult.failure(String message) {
+    return _ProfileFetchResult._(failureMessage: message);
+  }
+}
 
 class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
   // Existing usecases
@@ -66,29 +97,67 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
   ) async {
     emit(ProfileLoading());
 
-    final profileResult = await getUserProfileUseCase(NoParams());
-    final watchListResult = await getWatchListUseCase(NoParams());
-    final historyResult = await getHistoryUseCase(NoParams());
+    var primaryFetch = await _loadProfilePayload();
 
-    profileResult.fold(
-      (failure) => emit(ProfileError(message: failure.message)),
-      (profile) {
-        watchListResult.fold(
-          (failure) => emit(ProfileError(message: failure.message)),
-          (watchList) {
-            historyResult.fold(
-              (failure) => emit(ProfileError(message: failure.message)),
-              (history) {
-                emit(ProfileLoaded(
-                  userProfile: profile,
-                  watchList: watchList,
-                  history: history,
-                ));
-              },
-            );
-          },
-        );
-      },
+    // Auto-retry once for transient failures right after profile/update navigation.
+    if (!primaryFetch.isSuccess) {
+      await Future<void>.delayed(const Duration(milliseconds: 500));
+      primaryFetch = await _loadProfilePayload();
+    }
+
+    if (!primaryFetch.isSuccess || primaryFetch.payload == null) {
+      emit(ProfileError(
+        message: primaryFetch.failureMessage ?? 'Failed to fetch profile data',
+      ));
+      return;
+    }
+
+    var finalPayload = primaryFetch.payload!;
+
+    // Verification fetch confirms server state when first response is delayed.
+    if (event.verifyFreshness) {
+      await Future<void>.delayed(const Duration(milliseconds: 350));
+      final verificationFetch = await _loadProfilePayload();
+      if (verificationFetch.isSuccess && verificationFetch.payload != null) {
+        finalPayload = verificationFetch.payload!;
+      }
+    }
+
+    emit(ProfileLoaded(
+      userProfile: finalPayload.userProfile,
+      watchList: finalPayload.watchList,
+      history: finalPayload.history,
+    ));
+  }
+
+  Future<_ProfileFetchResult> _loadProfilePayload() async {
+    final profileResult = await getUserProfileUseCase(NoParams());
+    final profileFailure = profileResult.fold((failure) => failure, (_) => null);
+    if (profileFailure != null) {
+      return _ProfileFetchResult.failure(profileFailure.message);
+    }
+    final profile = profileResult.fold((_) => null, (value) => value)!;
+
+    final watchListResult = await getWatchListUseCase(NoParams());
+    final watchListFailure = watchListResult.fold((failure) => failure, (_) => null);
+    if (watchListFailure != null) {
+      return _ProfileFetchResult.failure(watchListFailure.message);
+    }
+    final watchList = watchListResult.fold((_) => null, (value) => value)!;
+
+    final historyResult = await getHistoryUseCase(NoParams());
+    final historyFailure = historyResult.fold((failure) => failure, (_) => null);
+    if (historyFailure != null) {
+      return _ProfileFetchResult.failure(historyFailure.message);
+    }
+    final history = historyResult.fold((_) => null, (value) => value)!;
+
+    return _ProfileFetchResult.success(
+      _ProfileFetchPayload(
+        userProfile: profile,
+        watchList: watchList,
+        history: history,
+      ),
     );
   }
 
@@ -249,18 +318,22 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
       ),
     );
 
-    result.fold(
+    final updateFailure = result.fold((failure) => failure, (_) => null);
+    if (updateFailure != null) {
+      emit(ActionError(
+        message: updateFailure.message,
+        action: 'update_profile',
+      ));
+      return;
+    }
+
+    final refreshedProfile = await getUserProfileUseCase(NoParams());
+    refreshedProfile.fold(
       (failure) => emit(ActionError(
         message: failure.message,
         action: 'update_profile',
       )),
-      (_) {
-        if (state is ProfileLoaded) {
-          emit(ProfileUpdatedSuccess(
-            updatedProfile: (state as ProfileLoaded).userProfile,
-          ));
-        }
-      },
+      (profile) => emit(ProfileUpdatedSuccess(updatedProfile: profile)),
     );
   }
 
@@ -299,7 +372,10 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
     final result = await deleteAccountUseCase(NoParams());
 
     result.fold(
-      (failure) => emit(ProfileError(message: failure.message)),
+      (failure) => emit(ActionError(
+        message: failure.message,
+        action: 'delete_account',
+      )),
       (_) => emit(DeleteAccountSuccess()),
     );
   }

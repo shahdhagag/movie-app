@@ -13,6 +13,3 @@ class DeleteAccountUseCase extends UseCase<void, NoParams> {
     return await repository.deleteAccount();
   }
 }
-
-
-
