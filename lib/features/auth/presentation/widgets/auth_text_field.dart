@@ -55,6 +55,8 @@ class _AuthTextFieldState extends State<AuthTextField> {
           validator: widget.validator,
           keyboardType: widget.keyboardType,
           obscureText: _obscureText,
+          cursorColor: AppColors.primary,
+
           maxLines: _obscureText ? 1 : widget.maxLines,
           onChanged: widget.onChanged,
           style: AppStyles.h5.copyWith(fontSize: 16.sp),

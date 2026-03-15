@@ -5,6 +5,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:movie/core/utils/app_assets.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../../../../config/routes/app_routes.dart';
 import '../../../../core/utils/app_colors.dart';
 import '../../../../core/utils/app_styles.dart';
 import '../../../../core/utils/app_validators.dart';
@@ -80,14 +82,43 @@ class _RegisterScreenState extends State<RegisterScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: BlocListener<AuthBloc, AuthState>(
-        listener: (context, state) {
+        listener: (context, state) async{
           if (state is AuthSuccess) {
+            final prefs = await SharedPreferences.getInstance();
+            await prefs.setBool('is_logged_in', true);
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(state.message)),
+              SnackBar(
+                content: Row(
+                  children: [
+                    Icon(Icons.check_circle, color: Colors.white),
+                    SizedBox(width: 12.w),
+                    Expanded(
+                      child: Text(
+                        'Registration successful!',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 16.sp,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                backgroundColor: Colors.green[600],
+                behavior: SnackBarBehavior.floating,
+                margin: EdgeInsets.symmetric(horizontal: 24.w, vertical: 16.h),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16.r),
+                ),
+                duration: const Duration(seconds: 3),
+                elevation: 8,
+              ),
             );
-            // Navigate to login screen
-            context.go('/login');
-          } else if (state is AuthError) {
+
+            Future.delayed(const Duration(seconds: 3), () {
+              context.go(AppRoutes.login);
+            });
+          }else if (state is AuthError) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(state.message),
@@ -105,24 +136,30 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     SizedBox(height: 60.h),
-                    GestureDetector(
-                      onTap: () => context.pop(),
-                      child: Icon(
-                        Icons.arrow_back_ios_rounded,
-                        color: AppColors.primary,
-                        size: 24.sp,
-                      ),
-                    ),
-                    SizedBox(height: 30.h),
-                    Center(
-                      child: Text(
-                        'Register',
-                        style: AppStyles.h2.copyWith(
-                          fontSize: 16.sp,
-                          color: AppColors.primary
+                    Row(
+                      children: [
+                        GestureDetector(
+                          onTap: () => context.pop(),
+                          child: Icon(
+                            Icons.arrow_back_ios_rounded,
+                            color: AppColors.primary,
+                            size: 24.sp,
+                          ),
                         ),
-                      ),
+                        SizedBox(width: 166.h),
+
+                        Center(
+                          child: Text(
+                            'Register',
+                            style: AppStyles.h2.copyWith(
+                                fontSize: 22.sp,
+                                color: AppColors.primary
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
+
                     SizedBox(height: 30.h),
 
                     Form(
@@ -135,8 +172,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                 SizedBox(height: 16.h),
                                 CarouselSlider(
                                   options: CarouselOptions(
-                                    height: 140.h,
-                                    viewportFraction: 0.35,
+                                    height: 150.h,
+                                    viewportFraction: 0.33,
+                                    enlargeFactor: 0.4,
+
                                     enlargeCenterPage: true,
                                     enableInfiniteScroll: true,
                                     scrollDirection: Axis.horizontal,
@@ -195,7 +234,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           AuthTextField(
                             hintText: 'Name',
                             controller: _nameController,
-                             prefixIcon: Image.asset(AppAssets.nameIcon,width: 3.w,height: 25.h),
+                             prefixIcon: Padding(
+                               padding: const EdgeInsets.all(3.0),
+                               child: Image.asset(AppAssets.nameIcon,width: 3.w,height: 25.h),
+                             ),
                             validator: AppValidators.validateName,
                           ),
                           SizedBox(height: 20.h),
@@ -203,7 +245,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           AuthTextField(
                             hintText: 'Email',
                             controller: _emailController,
-                            prefixIcon: Image.asset(AppAssets.emailIcon,width: 3.w,height: 25.h,),
+                            prefixIcon: Padding(
+                              padding: const EdgeInsets.all(3.0),
+                              child: Image.asset(AppAssets.emailIcon,width: 3.w,height: 25.h,),
+                            ),
                             keyboardType: TextInputType.emailAddress,
                             validator: AppValidators.validateEmail,
                           ),
@@ -212,7 +257,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           AuthTextField(
                             hintText: ' Phone number',
                             controller: _phoneController,
-                            prefixIcon: Image.asset(AppAssets.phoneIcon,width: 3.w,height: 25.h,),
+                            prefixIcon: Padding(
+                              padding: const EdgeInsets.all(3.0),
+                              child: Image.asset(AppAssets.phoneIcon,width: 3.w,height: 25.h,),
+                            ),
                             keyboardType: TextInputType.phone,
                             validator: AppValidators.validatePhone,
                           ),
@@ -221,7 +269,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           AuthTextField(
                             hintText: ' Password',
                             controller: _passwordController,
-                           prefixIcon: Image.asset(AppAssets.passwordIcon,width: 3.w,height: 25.h),
+                           prefixIcon: Padding(
+                             padding: const EdgeInsets.all(3.0),
+                             child: Image.asset(AppAssets.passwordIcon,width: 3.w,height: 25.h),
+                           ),
                             isPassword: true,
                             validator: AppValidators.validatePassword,
                           ),
@@ -230,7 +281,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           AuthTextField(
                             hintText: 'Confirm Password',
                             controller: _confirmPasswordController,
-                           prefixIcon: Image.asset(AppAssets.passwordIcon,width: 3.w,height: 25.h),
+                           prefixIcon: Padding(
+                             padding: const EdgeInsets.all(3.0),
+                             child: Image.asset(AppAssets.passwordIcon,width: 3.w,height: 25.h),
+                           ),
                             isPassword: true,
                             validator: (value) => AppValidators.validateConfirmPassword(
                               value,
@@ -247,22 +301,39 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: AppColors.primary,
                                 disabledBackgroundColor: AppColors.textTertiary,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12.r),
+                                ),
                               ),
                               child: state is AuthLoading
-                                  ? SizedBox(
-                                      height: 24.h,
-                                      width: 24.h,
-                                      child: const CircularProgressIndicator(
-                                        color: AppColors.background,
-                                      ),
-                                    )
-                                  : Text(
-                                      'Create Account',
-                                      style: AppStyles.h5.copyWith(
-                                        fontSize: 16.sp,
-                                        color: AppColors.textSecondary,
-                                      ),
+                                  ? Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  SizedBox(
+                                    width: 24.w,
+                                    height: 24.h,
+                                    child: const CircularProgressIndicator(
+                                      color: AppColors.background,
+                                      strokeWidth: 3,
                                     ),
+                                  ),
+                                  SizedBox(width: 12.w),
+                                  Text(
+                                    'Creating Account...',
+                                    style: AppStyles.h5.copyWith(
+                                      fontSize: 16.sp,
+                                      color: AppColors.textSecondary,
+                                    ),
+                                  ),
+                                ],
+                              )
+                                  : Text(
+                                'Create Account',
+                                style: AppStyles.h5.copyWith(
+                                  fontSize: 16.sp,
+                                  color: AppColors.textSecondary,
+                                ),
+                              ),
                             ),
                           ),
                           SizedBox(height: 20.h),
@@ -285,7 +356,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                     ),
                                     recognizer: TapGestureRecognizer()
                                       ..onTap = () {
-                                        context.push('/login');
+                                        context.push(AppRoutes.login);
                                       },
                                   ),
                                 ],

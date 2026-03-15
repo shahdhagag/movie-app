@@ -74,25 +74,31 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     SizedBox(height: 60.h),
-                    GestureDetector(
-                      onTap: () => context.pop(),
-                      child: Icon(
-                        Icons.arrow_back_ios_rounded,
-                        color: AppColors.primary,
-                        size: 24.sp,
-                      ),
-                    ),
-                    SizedBox(height: 40.h),
-
-                    Center(
-                      child: Text(
-                        'Forget Password',
-                        style: AppStyles.h2.copyWith(
-                          fontSize: 16.sp,
-                          color: AppColors.primary,
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        GestureDetector(
+                          onTap: () => context.pop(),
+                          child: Icon(
+                            Icons.arrow_back_ios_rounded,
+                            color: AppColors.primary,
+                            size: 24.sp,
+                          ),
                         ),
-                      ),
+                        SizedBox(width: 155.h),
+
+                        Center(
+                          child: Text(
+                            'Forget Password',
+                            style: AppStyles.h2.copyWith(
+                              fontSize: 16.sp,
+                              color: AppColors.primary,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
+
                     SizedBox(height: 60.h),
 
                     Center(
@@ -111,10 +117,13 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                           AuthTextField(
                             hintText: 'Email',
                             controller: _emailController,
-                            prefixIcon: Image.asset(
-                              AppAssets.emailIcon,
-                              width: 3.w,
-                              height: 25.h,
+                            prefixIcon: Padding(
+                              padding: const EdgeInsets.all(3.0),
+                              child: Image.asset(
+                                AppAssets.emailIcon,
+                                width: 3.w,
+                                height: 25.h,
+                              ),
                             ),
                             keyboardType: TextInputType.emailAddress,
                             validator: AppValidators.validateEmail,

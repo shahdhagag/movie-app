@@ -64,4 +64,6 @@ class PasswordResetEmailSent extends AuthState {
   @override
   List<Object?> get props => [message];
 }
+class LoginLoading extends AuthState {}
+class GoogleLoading extends AuthState {}
 

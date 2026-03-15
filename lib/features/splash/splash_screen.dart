@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:movie/core/utils/app_assets.dart';
 import 'package:movie/core/utils/app_colors.dart';
 import 'package:movie/config/routes/app_routes.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -19,6 +20,26 @@ class _SplashScreenState extends State<SplashScreen>
   late Animation<double> _fadeAnimation;
   late Animation<double> _scaleAnimation;
 
+  Future<void> _checkFirstTime() async {
+    await Future.delayed(const Duration(seconds: 3));
+
+    final prefs = await SharedPreferences.getInstance();
+    final seenOnboarding = prefs.getBool('onboarding_seen') ?? false;
+    final isLoggedIn = prefs.getBool('is_logged_in') ?? false;
+
+    if (!mounted) return;
+
+    if (!seenOnboarding) {
+      // First-time user → onboarding
+      context.go(AppRoutes.onboarding);
+    } else if (isLoggedIn) {
+      // Returning logged-in user → home/main
+      context.go(AppRoutes.main);
+    } else {
+      // Onboarding done, but not logged in → login screen
+      context.go(AppRoutes.login);
+    }
+  }
   @override
   void initState() {
     super.initState();
@@ -39,13 +60,8 @@ class _SplashScreenState extends State<SplashScreen>
     );
 
     _controller.forward();
+    _checkFirstTime();
 
-    // Navigate to onboarding after delay
-    Future.delayed(const Duration(seconds: 3), () {
-      if (mounted) {
-        context.go(AppRoutes.onboarding);
-      }
-    });
   }
 
   @override
