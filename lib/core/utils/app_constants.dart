@@ -1,15 +1,15 @@
 /// App Constants
 /// App Constants
 class AppConstants {
-  AppConstants._(); // prevent instantiation
+  AppConstants._();
 
   // API
   static const String baseUrl = 'https://movies-api.accel.li/api/v2';
   static const String apiKey = '--';
 
   // Timeouts
-  static const Duration connectionTimeout = Duration(seconds: 30);
-  static const Duration receiveTimeout = Duration(seconds: 30);
+  static const Duration connectionTimeout = Duration(seconds: 60);
+  static const Duration receiveTimeout = Duration(seconds: 60);
 
   // Pagination
   static const int defaultPage = 1;

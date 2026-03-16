@@ -25,6 +25,32 @@ class UserProfile extends Equatable {
     this.historyCount = 0,
   });
 
+  UserProfile copyWith({
+    String? uid,
+    String? email,
+    String? displayName,
+    String? phoneNumber,
+    String? photoUrl,
+    String? bio,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+    int? watchListCount,
+    int? historyCount,
+  }) {
+    return UserProfile(
+      uid: uid ?? this.uid,
+      email: email ?? this.email,
+      displayName: displayName ?? this.displayName,
+      phoneNumber: phoneNumber ?? this.phoneNumber,
+      photoUrl: photoUrl ?? this.photoUrl,
+      bio: bio ?? this.bio,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      watchListCount: watchListCount ?? this.watchListCount,
+      historyCount: historyCount ?? this.historyCount,
+    );
+  }
+
   @override
   List<Object?> get props => [
     uid,
@@ -39,4 +65,3 @@ class UserProfile extends Equatable {
     historyCount,
   ];
 }
-

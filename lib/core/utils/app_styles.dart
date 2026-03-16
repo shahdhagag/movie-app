@@ -6,7 +6,7 @@ import 'app_colors.dart';
 /// App Text Styles
 class AppStyles {
 
-  // ========== HEADINGS ==========
+  // HEADINGS
   static TextStyle h1 = GoogleFonts.inter(
     fontSize: 32.sp,
     fontWeight: FontWeight.bold,
@@ -78,7 +78,7 @@ class AppStyles {
     height: 1.5,
   );
 
-  // ========== BUTTON TEXT ==========
+  // BUTTON TEXT
   static TextStyle buttonLarge = GoogleFonts.inter(
     fontSize: 18.sp,
     fontWeight: FontWeight.w600,
@@ -100,7 +100,7 @@ class AppStyles {
     letterSpacing: 0.5,
   );
 
-  // ========== CAPTION & LABELS ==========
+  // CAPTION & LABELS
   static TextStyle caption = GoogleFonts.inter(
     fontSize: 12.sp,
     fontWeight: FontWeight.normal,
@@ -123,7 +123,7 @@ class AppStyles {
     height: 1.4,
   );
 
-  // ========== SPECIALIZED TEXT ==========
+  //SPECIALIZED TEXT
   static TextStyle movieTitle = GoogleFonts.inter(
     fontSize: 15.sp,
     fontWeight: FontWeight.bold,
@@ -159,7 +159,7 @@ class AppStyles {
     height: 1.2,
   );
 
-  // ========== INPUT TEXT ==========
+  //INPUT TEXT
   static TextStyle inputText = GoogleFonts.inter(
     fontSize: 14.sp,
     fontWeight: FontWeight.normal,

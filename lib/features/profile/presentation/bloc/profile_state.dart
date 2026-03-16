@@ -142,15 +142,13 @@ class MovieInHistoryStatus extends ProfileState {
 }
 
 class ProfileUpdatedSuccess extends ProfileState {
-  final UserProfile updatedProfile;
+  final UserProfile? updatedProfile;
 
-  const ProfileUpdatedSuccess({required this.updatedProfile});
+  const ProfileUpdatedSuccess({this.updatedProfile});
 
   @override
-  List<Object> get props => [updatedProfile];
+  List<Object?> get props => [updatedProfile];
 }
-
-// Stream Real-Time Update States
 class WatchListStreaming extends ProfileState {
   final List<MovieItem> watchList;
 

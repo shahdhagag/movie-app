@@ -1,10 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
+import '../../../../core/di/injection_conatiner.dart';
 import '../../../../core/utils/app_colors.dart';
 import '../../../browse/presentation/screen/browes_screen.dart';
+import '../../../profile/presentation/bloc/profile_state.dart';
 import '../../../profile/presentation/screens/profile_screen.dart';
 import '../../../search/presentation/screen/search_screen.dart';
 import '../widgets/custom_bottom_nav_bar.dart';
 import 'home_screen.dart';
+import '../../../profile/presentation/bloc/profile_bloc.dart';
+import '../../../profile/presentation/bloc/profile_event.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -15,44 +21,51 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> {
   int _currentIndex = 0;
-  int _profileRefreshVersion = 0;
+  late final ProfileBloc _profileBloc;
 
-  List<Widget> get _pages => [
-    const HomeScreen(),
-    const SearchScreen(),
-    const BrowseScreen(),
-    ProfileScreen(key: ValueKey('profile_$_profileRefreshVersion')),
+  final List<Widget> _pages = const [
+    HomeScreen(),
+    SearchScreen(),
+    BrowseScreen(),
+    ProfileScreen(),
   ];
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      body: Stack(
-        children: [
-          /// Pages
-          IndexedStack(
-            index: _currentIndex,
-            children: _pages,
-          ),
+  void initState() {
+    super.initState();
+    _profileBloc = getIt<ProfileBloc>();
+    if (_profileBloc.state is! ProfileLoaded && _profileBloc.state is! ProfileLoading) {
+      _profileBloc.add(const FetchUserProfile());
+    }
+  }
 
-          /// Bottom Nav Bar
-          Align(
-            alignment: Alignment.bottomCenter,
-            child: CustomBottomNavBar(
-              currentIndex: _currentIndex,
-              onTap: (index) {
-                setState(() {
-                  if (index == 3) {
-                    _profileRefreshVersion++;
-                  }
-                  _currentIndex = index;
-                });
-              },
+  @override
+  Widget build(BuildContext context) {
+    return BlocProvider<ProfileBloc>.value(
+      value: _profileBloc,
+      child: Scaffold(
+        backgroundColor: AppColors.background,
+        body: Stack(
+          children: [
+            IndexedStack(
+              index: _currentIndex,
+              children: _pages,
             ),
-          ),
-        ],
+            Align(
+              alignment: Alignment.bottomCenter,
+              child: CustomBottomNavBar(
+                currentIndex: _currentIndex,
+                onTap: (index) => setState(() => _currentIndex = index),
+              ),
+            ),
+          ],
+        ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
   }
 }

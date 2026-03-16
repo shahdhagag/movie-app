@@ -1,5 +1,5 @@
 class EndPoints {
-  EndPoints._(); // prevent instantiation
+  EndPoints._();
 
   static const String listMovies = '/list_movies.json';
   static const String movieDetails = '/movie_details.json';

@@ -20,6 +20,11 @@ class FetchUserProfile extends ProfileEvent {
   @override
   List<Object?> get props => [selectedTabIndex, verifyFreshness];
 }
+// profile_event.dart
+class ChangeProfileTab extends ProfileEvent {
+  final int tabIndex;
+  const ChangeProfileTab({required this.tabIndex});
+}
 
 class FetchWatchList extends ProfileEvent {
   const FetchWatchList();
@@ -130,7 +135,6 @@ class UpdateProfile extends ProfileEvent {
 
 class SwitchTabEvent extends ProfileEvent {
   final int tabIndex;
-
   const SwitchTabEvent(this.tabIndex);
 
   @override
