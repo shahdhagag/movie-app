@@ -23,6 +23,7 @@ import '../../features/splash/splash_screen.dart';
 import '../services/auth_service.dart';
 import 'app_routes.dart';
 
+/// ChangeNotifier wrapper for a Stream so GoRouter can listen.
 class GoRouterRefreshStream extends ChangeNotifier {
   GoRouterRefreshStream(Stream<dynamic> stream) {
     _subscription = stream.listen((_) {
@@ -51,20 +52,68 @@ class AppRouter {
     initialLocation: AppRoutes.splash,
     debugLogDiagnostics: false,
     routes: [
-      GoRoute(path: AppRoutes.splash, name: 'splash', builder: (c, s) => const SplashScreen()),
-      GoRoute(path: AppRoutes.onboarding, name: 'onboarding', builder: (c, s) => OnboardingScreen()),
-      GoRoute(path: AppRoutes.login, name: 'login', builder: (context, state) => BlocProvider<AuthBloc>(create: (_) => getIt<AuthBloc>(), child: const LoginScreen())),
-      GoRoute(path: AppRoutes.register, name: 'register', builder: (context, state) => BlocProvider<AuthBloc>(create: (_) => getIt<AuthBloc>(), child: const RegisterScreen())),
-      GoRoute(path: AppRoutes.forgotPassword, name: 'forgotPassword', builder: (context, state) => BlocProvider<AuthBloc>(create: (_) => getIt<AuthBloc>(), child: const ForgotPasswordScreen())),
-      GoRoute(path: AppRoutes.main, name: 'main', builder: (c, s) => const MainScreen()),
-      GoRoute(path: AppRoutes.home, name: 'home', builder: (c, s) => const HomeScreen()),
+      GoRoute(
+        path: AppRoutes.splash,
+        name: 'splash',
+        builder: (context, state) => const SplashScreen(),
+      ),
+
+      GoRoute(
+        path: AppRoutes.onboarding,
+        name: 'onboarding',
+        builder: (context, state) => OnboardingScreen(),
+      ),
+
+      GoRoute(
+        path: AppRoutes.login,
+        name: 'login',
+        builder: (context, state) => BlocProvider<AuthBloc>(
+          create: (_) => getIt<AuthBloc>(),
+          child: const LoginScreen(),
+        ),
+      ),
+
+      GoRoute(
+        path: AppRoutes.register,
+        name: 'register',
+        builder: (context, state) => BlocProvider<AuthBloc>(
+          create: (_) => getIt<AuthBloc>(),
+          child: const RegisterScreen(),
+        ),
+      ),
+
+      GoRoute(
+        path: AppRoutes.forgotPassword,
+        name: 'forgotPassword',
+        builder: (context, state) => BlocProvider<AuthBloc>(
+          create: (_) => getIt<AuthBloc>(),
+          child: const ForgotPasswordScreen(),
+        ),
+      ),
+
+      GoRoute(
+        path: AppRoutes.main,
+        name: 'main',
+        builder: (context, state) => const MainScreen(),
+      ),
+
+      GoRoute(
+        path: AppRoutes.home,
+        name: 'home',
+        builder: (context, state) => const HomeScreen(),
+      ),
+
       GoRoute(
         path: AppRoutes.genreMovies,
         builder: (context, state) {
           final extras = state.extra as Map<String, dynamic>;
-          return GenreMoviesScreen(genre: extras['genre'] as String, movies: extras['movies'] as List<Movie>);
+          return GenreMoviesScreen(
+            genre: extras['genre'] as String,
+            movies: extras['movies'] as List<Movie>,
+          );
         },
       ),
+
       GoRoute(
         path: AppRoutes.movieDetails,
         builder: (context, state) {
@@ -92,15 +141,136 @@ class AppRouter {
           return MovieDetailsScreen(movieId: movieId);
         },
       ),
-      GoRoute(path: AppRoutes.search, name: 'search', builder: (c, s) => const SearchScreen()),
-      GoRoute(path: AppRoutes.browse, name: 'browse', builder: (c, s) => const BrowseScreen()),
-      GoRoute(path: AppRoutes.profile, name: 'profile', builder: (context, state) => BlocProvider<ProfileBloc>.value(value: getIt<ProfileBloc>(), child: const ProfileScreen())),
-      GoRoute(path: AppRoutes.editProfile, name: 'editProfile', builder: (context, state) => BlocProvider<ProfileBloc>.value(value: getIt<ProfileBloc>(), child: const EditProfileScreen())),
+
+      GoRoute(
+        path: AppRoutes.search,
+        name: 'search',
+        builder: (context, state) => const SearchScreen(),
+      ),
+
+      GoRoute(
+        path: AppRoutes.browse,
+        name: 'browse',
+        builder: (context, state) => const BrowseScreen(),
+      ),
+
+      GoRoute(
+        path: AppRoutes.profile,
+        name: 'profile',
+        builder: (context, state) => BlocProvider<ProfileBloc>.value(
+          value: getIt<ProfileBloc>(),
+          child: const ProfileScreen(),
+        ),
+      ),
+
+      GoRoute(
+        path: AppRoutes.editProfile,
+        name: 'editProfile',
+        builder: (context, state) => BlocProvider<ProfileBloc>.value(
+          value: getIt<ProfileBloc>(),
+          child: const EditProfileScreen(),
+        ),
+      ),
+
+      // Additional placeholder routes (keep or replace with real screens as needed)
+      GoRoute(
+        path: AppRoutes.moviesByGenre,
+        name: 'moviesByGenre',
+        builder: (context, state) {
+          final genreId = state.uri.queryParameters['genreId'];
+          final genreName = state.uri.queryParameters['genreName'];
+          return Placeholder();
+        },
+      ),
+      GoRoute(
+        path: AppRoutes.moviesByCategory,
+        name: 'moviesByCategory',
+        builder: (context, state) => const Placeholder(),
+      ),
+      GoRoute(
+        path: '${AppRoutes.watchMovie}/:id',
+        name: 'watchMovie',
+        builder: (context, state) => const Placeholder(),
+      ),
+
+      GoRoute(
+        path: AppRoutes.updateProfile,
+        name: 'updateProfile',
+        builder: (context, state) => const Placeholder(),
+      ),
+      GoRoute(
+        path: AppRoutes.favorites,
+        name: 'favorites',
+        builder: (context, state) => const Placeholder(),
+      ),
+      GoRoute(
+        path: AppRoutes.watchlist,
+        name: 'watchlist',
+        builder: (context, state) => const Placeholder(),
+      ),
+      GoRoute(
+        path: AppRoutes.settings,
+        name: 'settings',
+        builder: (context, state) => const Placeholder(),
+      ),
+
+      // Other static pages
+      GoRoute(
+        path: AppRoutes.about,
+        name: 'about',
+        builder: (context, state) => const Placeholder(),
+      ),
+      GoRoute(
+        path: AppRoutes.privacy,
+        name: 'privacy',
+        builder: (context, state) => const Placeholder(),
+      ),
+      GoRoute(
+        path: AppRoutes.terms,
+        name: 'terms',
+        builder: (context, state) => const Placeholder(),
+      ),
     ],
 
+    // Error handler
+    errorBuilder: (context, state) => Scaffold(
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(Icons.error_outline, size: 80, color: Colors.red),
+            const SizedBox(height: 16),
+            Text(
+              'Page not found!',
+              style: Theme.of(context).textTheme.headlineSmall,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              state.uri.toString(),
+              style: Theme.of(context).textTheme.bodyMedium,
+            ),
+            const SizedBox(height: 24),
+            ElevatedButton(
+              onPressed: () => context.go(AppRoutes.home),
+              child: const Text('Go to Home'),
+            ),
+          ],
+        ),
+      ),
+    ),
+
+    // Redirect based on AuthService.isLoggedIn (synchronous)
     redirect: (context, state) {
       final loggedIn = _authService.isLoggedIn;
-      final publicPaths = <String>{AppRoutes.splash, AppRoutes.onboarding, AppRoutes.login, AppRoutes.register, AppRoutes.forgotPassword};
+
+      final publicPaths = <String>{
+        AppRoutes.splash,
+        AppRoutes.onboarding,
+        AppRoutes.login,
+        AppRoutes.register,
+        AppRoutes.forgotPassword,
+      };
+
       final goingToLogin = state.matchedLocation == AppRoutes.login;
       final goingToPublic = publicPaths.contains(state.matchedLocation);
 
@@ -109,6 +279,7 @@ class AppRouter {
       return null;
     },
 
+    // Refresh when AuthService emits changes so redirect re-evaluates.
     refreshListenable: GoRouterRefreshStream(_authService.authStateChanges),
   );
 }

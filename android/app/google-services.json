@@ -12,7 +12,20 @@
           "package_name": "com.shahd.dev.movieapp.movie"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "370713648945-evj269c6bdneatgkenh0pbhmf0mlkes0.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.shahd.dev.movieapp.movie",
+            "certificate_hash": "17094d39f75997f5beb9dada417877ab8fbbf834"
+          }
+        },
+        {
+          "client_id": "370713648945-c5cfi1sa0j62clf5c0mjuq9bp3h95aae.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyB7RnDFWH5F0yoMLa2ahvJC9L_5tliGQA0"
@@ -20,7 +33,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "370713648945-c5cfi1sa0j62clf5c0mjuq9bp3h95aae.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "370713648945-ekm6i1crhbtc74crnokmnve2bfqs34cd.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.shahd.dev.movieapp.movie"
+              }
+            }
+          ]
         }
       }
     }

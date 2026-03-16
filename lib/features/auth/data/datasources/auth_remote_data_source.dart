@@ -1,4 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import '../../../../core/errors/exceptions.dart';
 import '../models/auth_user_model.dart';
@@ -35,14 +37,56 @@ abstract class AuthRemoteDataSource {
 
 class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   final FirebaseAuth _firebaseAuth;
-  Future<void>? _googleSignInInitFuture;
+  final FirebaseFirestore _firestore;
+  final GoogleSignIn _googleSignIn;
+  final String _googleWebClientId;
 
-  AuthRemoteDataSourceImpl({required FirebaseAuth firebaseAuth})
-      : _firebaseAuth = firebaseAuth;
+  static const String _defaultGoogleWebClientId =
+      '370713648945-c5cfi1sa0j62clf5c0mjuq9bp3h95aae.apps.googleusercontent.com';
+  static const List<String> _googleAuthScopes = <String>[
+    'https://www.googleapis.com/auth/userinfo.email',
+    'https://www.googleapis.com/auth/userinfo.profile',
+  ];
 
-  Future<void> _ensureGoogleSignInInitialized() async {
-    _googleSignInInitFuture ??= GoogleSignIn.instance.initialize();
-    await _googleSignInInitFuture;
+  AuthRemoteDataSourceImpl({
+    required FirebaseAuth firebaseAuth,
+    required FirebaseFirestore firestore,
+    String googleWebClientId = _defaultGoogleWebClientId,
+  }) : _firebaseAuth = firebaseAuth,
+       _firestore = firestore,
+       _googleWebClientId = googleWebClientId,
+       _googleSignIn = GoogleSignIn.instance;
+
+  Future<void>? _initFuture;
+
+  Future<void> _ensureInitialized() async {
+    _initFuture ??= _googleSignIn.initialize(
+      clientId: kIsWeb ? _googleWebClientId : null,
+    );
+    await _initFuture;
+  }
+
+  Future<void> _createUserDocumentIfNew(UserCredential userCredential) async {
+    if (userCredential.additionalUserInfo?.isNewUser != true) {
+      return;
+    }
+
+    final user = userCredential.user;
+    if (user == null) {
+      return;
+    }
+
+    final now = DateTime.now().toIso8601String();
+    await _firestore.collection('users').doc(user.uid).set({
+      'uid': user.uid,
+      'email': user.email ?? '',
+      'displayName': user.displayName ?? '',
+      'phoneNumber': user.phoneNumber ?? '',
+      'photoUrl': user.photoURL,
+      'bio': null,
+      'createdAt': now,
+      'updatedAt': now,
+    });
   }
 
   @override
@@ -69,9 +113,25 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       await user.reload();
 
       final updatedUser = _firebaseAuth.currentUser;
+      if (updatedUser == null) {
+        throw AuthException('Failed to retrieve user after registration');
+      }
+
+      // Create user document in Firestore
+      final now = DateTime.now().toIso8601String();
+      await _firestore.collection('users').doc(updatedUser.uid).set({
+        'uid': updatedUser.uid,
+        'email': updatedUser.email ?? '',
+        'displayName': name,
+        'phoneNumber': phoneNumber,
+        'photoUrl': photoUrl,
+        'bio': null,
+        'createdAt': now,
+        'updatedAt': now,
+      });
 
       return AuthUserModel(
-        uid: updatedUser!.uid,
+        uid: updatedUser.uid,
         email: updatedUser.email ?? '',
         displayName: updatedUser.displayName ?? name,
         phoneNumber: phoneNumber,
@@ -119,6 +179,8 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   @override
   Future<void> logout() async {
     try {
+      await _ensureInitialized();
+      await _googleSignIn.signOut();
       await _firebaseAuth.signOut();
     } catch (e) {
       throw AuthException('Logout failed: ${e.toString()}');
@@ -132,7 +194,9 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     } on FirebaseAuthException catch (e) {
       throw _handleFirebaseAuthException(e);
     } catch (e) {
-      throw AuthException('Failed to send password reset email: ${e.toString()}');
+      throw AuthException(
+        'Failed to send password reset email: ${e.toString()}',
+      );
     }
   }
 
@@ -212,6 +276,10 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         return AuthException('This operation is not allowed');
       case 'too-many-requests':
         return AuthException('Too many login attempts. Please try again later');
+      case 'network-request-failed':
+        return AuthException(
+          'Network error. Please check your connection and try again',
+        );
       case 'account-exists-with-different-credential':
         return AuthException('Account exists with different credentials');
       case 'invalid-credential':
@@ -226,24 +294,31 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   @override
   Future<AuthUserModel> signInWithGoogle() async {
     try {
-      await _ensureGoogleSignInInitialized();
+      await _ensureInitialized();
+      final GoogleSignInAccount googleUser = await _googleSignIn.authenticate();
 
-      final googleSignIn = GoogleSignIn.instance;
+      final GoogleSignInAuthentication googleAuth = googleUser.authentication;
 
-      final googleUser = await googleSignIn.authenticate(
-        scopeHint: ['email', 'profile'],
+      // google_sign_in 7.x requires at least one requested scope.
+      final authz = await googleUser.authorizationClient.authorizeScopes(
+        _googleAuthScopes,
+      );
+      final String accessToken = authz.accessToken;
+      final String? idToken = googleAuth.idToken;
+
+      if (accessToken.isEmpty && (idToken == null || idToken.isEmpty)) {
+        throw AuthException('Google sign in failed: missing auth tokens');
+      }
+
+      final AuthCredential credential = GoogleAuthProvider.credential(
+        accessToken: accessToken,
+        idToken: idToken,
       );
 
-      final googleAuth = googleUser.authentication;
-
-      final googleAuthz = await googleUser.authorizationClient.authorizeScopes(['email', 'profile']);
-
-      final credential = GoogleAuthProvider.credential(
-        accessToken: googleAuthz.accessToken,
-        idToken: googleAuth.idToken,
-      );
-
-      final userCredential = await _firebaseAuth.signInWithCredential(credential);
+      final UserCredential userCredential =
+          await _firebaseAuth.signInWithCredential(credential);
+      
+      await _createUserDocumentIfNew(userCredential);
 
       final user = userCredential.user;
       if (user == null) {
@@ -258,15 +333,18 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         isEmailVerified: user.emailVerified,
         photoUrl: user.photoURL,
       );
-    } on AuthException {
-      rethrow;
+    } on FirebaseAuthException catch (e) {
+      throw _handleFirebaseAuthException(e);
     } on GoogleSignInException catch (e) {
       if (e.code == GoogleSignInExceptionCode.canceled) {
         throw AuthException('Google sign in was cancelled');
       }
-      throw AuthException('Google sign in failed: ${e.description ?? e.code}');
-    } on FirebaseAuthException catch (e) {
-      throw _handleFirebaseAuthException(e);
+      if (e.code == GoogleSignInExceptionCode.clientConfigurationError) {
+        throw AuthException(
+          'Google sign in failed: check OAuth client configuration',
+        );
+      }
+      throw AuthException('Google sign in failed: ${e.description}');
     } catch (e) {
       throw AuthException('Google sign in failed: ${e.toString()}');
     }

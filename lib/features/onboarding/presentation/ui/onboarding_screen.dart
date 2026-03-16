@@ -4,9 +4,6 @@ import 'package:go_router/go_router.dart';
 import 'package:movie/core/utils/app_assets.dart';
 import 'package:movie/features/onboarding/presentation/ui/widgets/onboarding_first_page.dart';
 import 'package:movie/features/onboarding/presentation/ui/widgets/onboarding_page_item.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import '../../../../config/routes/app_routes.dart';
-import '../../../../config/services/local_storage_service.dart';
 import '../../domain/entities/onboarding_entity.dart';
 import '../bloc/onboarding_cubit.dart';
 import '../bloc/onboarding_state.dart';
@@ -88,12 +85,9 @@ class OnboardingScreen extends StatelessWidget {
                 return OnboardingPageItem(
                   entity: page,
                   isLast: state.isLast(pages.length),
-                  onNext: () async {
+                  onNext: () {
                     if (state.isLast(pages.length)) {
-                      final prefs = await SharedPreferences.getInstance();
-                      await prefs.setBool('onboarding_seen', true);
-
-                      context.go(AppRoutes.login);
+                      context.go('/login');
                     } else {
                       controller.nextPage(
                         duration: const Duration(milliseconds: 300),
