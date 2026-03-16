@@ -63,3 +63,14 @@ This app follows Clean Architecture principles with three main layers:
 For help getting started with Flutter development, view the
 [online documentation](https://docs.flutter.dev/), which offers tutorials,
 samples, guidance on mobile development, and a full API reference.
+
+
+screenshots 
+
+
+## 📱 Screenshots
+
+![Home Screen](assets/screenshots/home1.png)
+![Movie Details](assets/screenshots/details1.png)
+
+
