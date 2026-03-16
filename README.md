@@ -87,7 +87,6 @@ This app follows **Clean Architecture** principles:
   <img src="assets/screenshots/home1.png" alt="Home 1" width="200"/>
   <img src="assets/screenshots/home2.png" alt="Home 2" width="200"/>
   <img src="assets/screenshots/home3.png" alt="Home 3" width="200"/>
-  <img src="assets/screenshots/browsescreen.png" alt="Browse Screen" width="200"/>
 </p>
 
 ### 🎥 Movie Details
@@ -98,10 +97,12 @@ This app follows **Clean Architecture** principles:
   <img src="assets/screenshots/movie_Detailes1.png" alt="Movie Details 1" width="200"/>
 </p>
 
-### 🔎 Search
+### 🔎 Search & Browse
 
 <p align="center">
   <img src="assets/screenshots/searchscreen.png" alt="Search Screen" width="200"/>
+  <img src="assets/screenshots/browsescreen.png" alt="Browse Screen" width="200"/>
+
 </p>
 
 ### 👤 Profile & Authentication
