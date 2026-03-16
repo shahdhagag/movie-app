@@ -70,7 +70,7 @@ screenshots
 
 ## 📱 Screenshots
 
-![Home Screen](assets/screenshots/home1.png)
-![Movie Details](assets/screenshots/details1.png)
-
-
+<p align="center">
+  <img src="assets/screenshots/home1.png" alt="Home Screen" width="250"/>
+  <img src="assets/screenshots/home_detailes3.png" alt="Movie Details" width="250"/>
+</p>
