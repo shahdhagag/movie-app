@@ -81,6 +81,21 @@ This app follows **Clean Architecture** principles:
 
 ## 📱 Screenshots
 
+### 🚀 Splash & Onboarding
+
+<p align="center">
+  <img src="assets/screenshots/Splash%20Screen.png" alt="Splash Screen" width="200"/>
+  <img src="assets/screenshots/On%20Boarding%201.png" alt="Onboarding 1" width="200"/>
+  <img src="assets/screenshots/On%20Boarding%202.png" alt="Onboarding 2" width="200"/>
+  <img src="assets/screenshots/On%20Boarding%203.png" alt="Onboarding 3" width="200"/>
+</p>
+
+<p align="center">
+  <img src="assets/screenshots/On%20Boarding%204.png" alt="Onboarding 4" width="200"/>
+  <img src="assets/screenshots/On%20Boarding%205.png" alt="Onboarding 5" width="200"/>
+  <img src="assets/screenshots/On%20Boarding%206.png" alt="Onboarding 6" width="200"/>
+</p>
+
 ### 🏠 Home & Browse
 
 <p align="center">
